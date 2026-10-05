@@ -1,0 +1,26 @@
+# Generated working files and caches
+/intermediate/
+/build/intermediate/
+/build/.gradle/
+/.gradle/
+/.tools/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Local IDE settings
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# build/, source/, document/, helper/, and deliverables/ are versioned.
+# Keep the Gradle Wrapper JAR and distribution JARs in Git.

@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'eclipse'
+    id 'net.minecraftforge.gradle' version '7.0.17'
+}
+
+// Keep generated working files separate from source and release deliverables.
+layout.buildDirectory = layout.projectDirectory.dir('../intermediate/gradle-output')
+
+version = mod_version
+group = 'dev.lotcarnage.culinaryexpansion'
+base { archivesName = "culinary-expansion-${minecraft_version}" }
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+minecraft {
+    mavenizerOutput = layout.projectDirectory.dir('../intermediate/forge-maven')
+    runs {
+        configureEach {
+            workingDir = layout.projectDirectory.dir('../intermediate/run')
+            systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
+        }
+        register('client')
+        register('server') { args '--nogui' }
+    }
+}
+repositories {
+    minecraft.mavenizer(it)
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+    mavenCentral()
+}
+dependencies {
+    implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
+    annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.6'
+}
+tasks.named('processResources', ProcessResources).configure {
+    inputs.property 'mod_version', mod_version
+    filesMatching('META-INF/mods.toml') { expand mod_version: mod_version }
+}
+tasks.named('jar', Jar).configure { from('../LICENSE') }
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+sourceSets {
+    main {
+        java.setSrcDirs(['../source/main/java'])
+        resources.setSrcDirs(['../source/main/resources'])
+    }
+}

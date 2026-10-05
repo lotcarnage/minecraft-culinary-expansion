@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Minecraft Java Editionに料理系のアイテムとレシピを追加するCulinary Expansion。Forge版の配布JARと導入手順。">
+  <title>Culinary Expansion — ダウンロード</title>
+  <style>
+    :root { color-scheme: dark; --bg:#121b16; --panel:#1d2b22; --text:#f3f4e9; --muted:#c0cbbf; --accent:#ffcf61; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; line-height:1.8; }
+    main { max-width:920px; margin:auto; padding:64px 24px 40px; }
+    .eyebrow { color:var(--accent); font-size:.8rem; letter-spacing:.15em; font-weight:700; }
+    h1 { font-size:clamp(2rem,6vw,3.8rem); line-height:1.15; margin:16px 0 24px; }
+    h2 { font-size:1.3rem; margin:0 0 16px; }
+    p { margin:12px 0; }
+    .lead { font-size:1.15rem; color:var(--muted); max-width:650px; }
+    .hero { display:flex; align-items:center; justify-content:space-between; gap:28px; }
+    .egg { width:112px; height:112px; image-rendering:pixelated; flex-shrink:0; }
+    .card { background:var(--panel); border:1px solid #3a4d3d; border-radius:16px; padding:28px; margin-top:28px; }
+    .badges { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 22px; }
+    .badge { border:1px solid #526354; border-radius:6px; padding:3px 10px; font-size:.9rem; }
+    a { color:var(--accent); text-underline-offset:4px; }
+    .button { display:inline-block; background:var(--accent); color:#211a0a; border-radius:8px; padding:12px 22px; font-weight:700; text-decoration:none; }
+    .button:hover { background:#ffe099; }
+    a:focus-visible { outline:3px solid white; outline-offset:5px; }
+    .small { font-size:.9rem; color:var(--muted); }
+    code { background:#101b14; padding:2px 6px; border-radius:4px; overflow-wrap:anywhere; }
+    .hash { display:block; word-break:break-all; font-size:.8rem; margin-top:8px; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    ol,ul { padding-left:24px; }
+    li { margin:8px 0; }
+    footer { margin-top:40px; color:var(--muted); font-size:.85rem; }
+    @media(max-width:600px) { main { padding-top:36px; } .grid { grid-template-columns:1fr; gap:0; } .egg { width:64px; height:64px; } .card { padding:22px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div>
+      <div class="eyebrow">MINECRAFT JAVA EDITION MOD</div>
+      <h1>Culinary<br>Expansion</h1>
+      <p class="lead">Minecraftの食卓に、もっと料理を。<br>料理系のアイテムとレシピを追加するMODです。</p>
+    </div>
+    <img class="egg" src="assets/fried_egg.png" width="112" height="112" alt="目玉焼きのピクセルアート">
+  </header>
+  <section class="card" aria-labelledby="download-title">
+    <h2 id="download-title">Forge版をダウンロード</h2>
+    <div class="badges">
+      <span class="badge">Minecraft {{MINECRAFT_VERSION}}</span>
+      <span class="badge">Forge {{FORGE_VERSION}}</span>
+      <span class="badge">MOD v{{MOD_VERSION}}</span>
+    </div>
+    <a class="button" href="downloads/{{JAR_NAME}}" download>配布用JARをダウンロード</a>
+    <p class="small">{{JAR_NAME}} · {{JAR_SIZE}} KB<br>Minecraft Java Edition専用です。クライアントとサーバーの両方に対応しています。</p>
+    <details>
+      <summary>ファイルのチェックサム（SHA-256）</summary>
+      <code class="hash">{{SHA256}}</code>
+      <p><a href="downloads/{{JAR_NAME}}.sha256" download>チェックサムファイルをダウンロード</a></p>
+    </details>
+  </section>
+  <div class="grid">
+    <section class="card" aria-labelledby="recipe-title">
+      <h2 id="recipe-title">現在の追加料理：目玉焼き</h2>
+      <p class="small">v{{MOD_VERSION}}では、最初の料理として目玉焼きを追加しています。</p>
+      <ul>
+        <li>卵1個 ＋ 燃料 → 目玉焼き1個</li>
+        <li>かまどで10秒、燻製器で5秒</li>
+        <li>食べると満腹度5を回復</li>
+        <li>卵を入手するとレシピ本に登録</li>
+      </ul>
+      <p class="small">日本語・英語の表示に対応しています。</p>
+    </section>
+    <section class="card" aria-labelledby="install-title">
+      <h2 id="install-title">導入方法</h2>
+      <ol>
+        <li>Java 25を使用するMinecraft {{MINECRAFT_VERSION}}環境を用意します。</li>
+        <li><a href="https://files.minecraftforge.net/net/minecraftforge/forge/index_{{MINECRAFT_VERSION}}.html">Forge {{FORGE_VERSION}}</a>をインストールします。</li>
+        <li>ダウンロードしたJARをゲームフォルダーの<code>mods</code>に入れます。</li>
+        <li>Forgeのプロファイルでゲームを起動します。</li>
+      </ol>
+      <p class="small">マルチプレイでは、参加者とサーバーに同じバージョンのMODを導入してください。</p>
+    </section>
+  </div>
+  <footer>
+    <a href="https://github.com/lotcarnage/minecraft-culinary-expansion">ソースコード・開発手順</a>
+    <p>MIT License · lotcarnage<br>Minecraftの公式製品ではありません。MojangまたはMicrosoftの承認・提携を受けていません。</p>
+  </footer>
+</main>
+</body>
+</html>

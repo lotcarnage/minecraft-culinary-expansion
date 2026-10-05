@@ -1,0 +1,287 @@
+{
+  "minecraft_version": "26.3",
+  "definition_source": "Minecraft 26.3 net.minecraft.world.food.Foods (Forge 66.0.5 development sources)",
+  "scope": "Foodsに定義される食料。ケーキなどブロックとして食べるもの、追加効果は対象外。",
+  "items": [
+    {
+      "id": "minecraft:apple",
+      "name": "リンゴ",
+      "nutrition": 4,
+      "saturation_modifier": 0.3,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:baked_potato",
+      "name": "ベイクドポテト",
+      "nutrition": 5,
+      "saturation_modifier": 0.6,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:beef",
+      "name": "生の牛肉",
+      "nutrition": 3,
+      "saturation_modifier": 0.3,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:beetroot",
+      "name": "ビートルート",
+      "nutrition": 1,
+      "saturation_modifier": 0.6,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:beetroot_soup",
+      "name": "ビートルートスープ",
+      "nutrition": 6,
+      "saturation_modifier": 0.6,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:bread",
+      "name": "パン",
+      "nutrition": 5,
+      "saturation_modifier": 0.6,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:carrot",
+      "name": "ニンジン",
+      "nutrition": 3,
+      "saturation_modifier": 0.6,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:chicken",
+      "name": "生の鶏肉",
+      "nutrition": 2,
+      "saturation_modifier": 0.3,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:chorus_fruit",
+      "name": "コーラスフルーツ",
+      "nutrition": 4,
+      "saturation_modifier": 0.3,
+      "always_edible": true
+    },
+    {
+      "id": "minecraft:cod",
+      "name": "生鱈",
+      "nutrition": 2,
+      "saturation_modifier": 0.1,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:cooked_beef",
+      "name": "ステーキ",
+      "nutrition": 8,
+      "saturation_modifier": 0.8,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:cooked_chicken",
+      "name": "焼き鳥",
+      "nutrition": 6,
+      "saturation_modifier": 0.6,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:cooked_cod",
+      "name": "焼き鱈",
+      "nutrition": 5,
+      "saturation_modifier": 0.6,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:cooked_mutton",
+      "name": "焼き羊肉",
+      "nutrition": 6,
+      "saturation_modifier": 0.8,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:cooked_porkchop",
+      "name": "焼き豚",
+      "nutrition": 8,
+      "saturation_modifier": 0.8,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:cooked_rabbit",
+      "name": "焼き兎肉",
+      "nutrition": 5,
+      "saturation_modifier": 0.6,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:cooked_salmon",
+      "name": "焼き鮭",
+      "nutrition": 6,
+      "saturation_modifier": 0.8,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:cookie",
+      "name": "クッキー",
+      "nutrition": 2,
+      "saturation_modifier": 0.1,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:dried_kelp",
+      "name": "乾燥した昆布",
+      "nutrition": 1,
+      "saturation_modifier": 0.3,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:enchanted_golden_apple",
+      "name": "エンチャントされた金のリンゴ",
+      "nutrition": 4,
+      "saturation_modifier": 1.2,
+      "always_edible": true
+    },
+    {
+      "id": "minecraft:golden_apple",
+      "name": "金のリンゴ",
+      "nutrition": 4,
+      "saturation_modifier": 1.2,
+      "always_edible": true
+    },
+    {
+      "id": "minecraft:golden_carrot",
+      "name": "金のニンジン",
+      "nutrition": 6,
+      "saturation_modifier": 1.2,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:honey_bottle",
+      "name": "ハチミツ入りの瓶",
+      "nutrition": 6,
+      "saturation_modifier": 0.1,
+      "always_edible": true
+    },
+    {
+      "id": "minecraft:melon_slice",
+      "name": "スイカの薄切り",
+      "nutrition": 2,
+      "saturation_modifier": 0.3,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:mushroom_stew",
+      "name": "キノコシチュー",
+      "nutrition": 6,
+      "saturation_modifier": 0.6,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:mutton",
+      "name": "生の羊肉",
+      "nutrition": 2,
+      "saturation_modifier": 0.3,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:poisonous_potato",
+      "name": "青くなったジャガイモ",
+      "nutrition": 2,
+      "saturation_modifier": 0.3,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:porkchop",
+      "name": "生の豚肉",
+      "nutrition": 3,
+      "saturation_modifier": 0.3,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:potato",
+      "name": "ジャガイモ",
+      "nutrition": 1,
+      "saturation_modifier": 0.3,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:pufferfish",
+      "name": "フグ",
+      "nutrition": 1,
+      "saturation_modifier": 0.1,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:pumpkin_pie",
+      "name": "パンプキンパイ",
+      "nutrition": 8,
+      "saturation_modifier": 0.3,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:rabbit",
+      "name": "生の兎肉",
+      "nutrition": 3,
+      "saturation_modifier": 0.3,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:rabbit_stew",
+      "name": "ウサギシチュー",
+      "nutrition": 10,
+      "saturation_modifier": 0.6,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:rotten_flesh",
+      "name": "腐った肉",
+      "nutrition": 4,
+      "saturation_modifier": 0.1,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:salmon",
+      "name": "生鮭",
+      "nutrition": 2,
+      "saturation_modifier": 0.1,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:spider_eye",
+      "name": "クモの目",
+      "nutrition": 2,
+      "saturation_modifier": 0.8,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:suspicious_stew",
+      "name": "怪しげなシチュー",
+      "nutrition": 6,
+      "saturation_modifier": 0.6,
+      "always_edible": true
+    },
+    {
+      "id": "minecraft:sweet_berries",
+      "name": "スイートベリー",
+      "nutrition": 2,
+      "saturation_modifier": 0.1,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:glow_berries",
+      "name": "グロウベリー",
+      "nutrition": 2,
+      "saturation_modifier": 0.1,
+      "always_edible": false
+    },
+    {
+      "id": "minecraft:tropical_fish",
+      "name": "熱帯魚",
+      "nutrition": 1,
+      "saturation_modifier": 0.1,
+      "always_edible": false
+    }
+  ]
+}

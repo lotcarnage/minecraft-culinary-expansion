@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "minecraft:egg",
+  "result": {
+    "id": "culinary_expansion:fried_egg",
+    "count": 1
+  },
+  "experience": 0.1,
+  "cookingtime": 50
+}

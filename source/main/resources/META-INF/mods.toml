@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="[66,)"
+license="MIT"
+[[mods]]
+modId="culinary_expansion"
+version="${mod_version}"
+displayName="Culinary Expansion"
+authors="lotcarnage"
+description='''Adds food items and cooking recipes, starting with fried eggs.'''
+[[dependencies.culinary_expansion]]
+modId="forge"
+mandatory=true
+versionRange="[66.0.5,67)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.culinary_expansion]]
+modId="minecraft"
+mandatory=true
+versionRange="[26.3,26.4)"
+ordering="NONE"
+side="BOTH"
