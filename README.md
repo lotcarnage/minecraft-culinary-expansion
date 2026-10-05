@@ -1,97 +1,74 @@
 # Culinary Expansion
 
-Minecraft Java Edition **26.3 / Forge 66.0.5 / JDK 25** 向けに、料理系のアイテムとレシピを追加するMODです。
-
-料理の種類や調理レシピを拡張していくプロジェクトで、現在のv0.1.0では最初の料理として目玉焼きを実装しています。
+Minecraft Java Edition向けに、料理系のアイテムとレシピを拡張するForge MODの開発リポジトリです。MODのソース、アイテム定義を編集する開発ツール、ビルド構成、配布ページを管理します。
 
 ## ダウンロード
 
 **[ダウンロードページを開く](https://lotcarnage.github.io/minecraft-culinary-expansion/deliverables/)**
 
-配布用JAR、SHA-256チェックサム、導入手順を掲載しています。Minecraft 26.3とForge 66.0.5を使用し、ダウンロードしたJARをゲームディレクトリの`mods`に配置してください。
+配布JAR、対応バージョン、チェックサム、導入手順はダウンロードページを参照してください。ページの生成元は `build/download-page.template.html`、公開ファイルは `deliverables/index.html` です。
 
-リポジトリ内のページは[deliverables/index.html](deliverables/index.html)です。公開URLはGitHub Pagesのデプロイ完了後に利用できます。
+## リポジトリ構成
 
-## 現在の追加料理
+| ディレクトリ | 用途 |
+|---|---|
+| `build/` | Gradle構成、Wrapper、配布ページのテンプレート。 |
+| `source/` | Javaソース、ゲーム用リソース、アイテムの編集元JSON、公式食料の参考データ。 |
+| `document/` | 開発用文書と自動生成する管理一覧。 |
+| `helper/` | アイテムエディター、一覧生成、ビルド・配布補助スクリプト、テスト。 |
+| `deliverables/` | 公開用HTML、画像、配布JAR、チェックサム。 |
+| `intermediate/` | クラス、一時JAR、キャッシュ、レポートなどの中間成果物。Git管理対象外。 |
 
-- 卵1個をかまどで200 tick（10秒）、または燻製器で基準200 tick（通常の実調理時間は5秒）加熱すると目玉焼き1個になります。燃料が必要です。
-- 満腹度を5、隠し満腹度を6回復します。最大64個スタックできます。
-- クリエイティブの「食べ物と飲み物」に表示されます。
-- 卵を入手するとレシピ本に登録されます。
-- 日本語・英語の名前と16×16のオリジナルテクスチャを同梱しています。
+Minecraft・Forge・MODのバージョンは `build/gradle.properties`、依存範囲は `source/main/resources/META-INF/mods.toml` で管理します。
 
-## 開発環境
+## 開発とビルド
 
-Python 3.9以上と64-bit JDK 25をインストールし、`JAVA_HOME`をJDKのディレクトリに設定してください。Gradleの別途インストールは不要です。初回はインターネット接続が必要です。
+Python 3.9以上と64-bit JDK 25が必要です。GUIにはPython標準のTkinterを使用します。Gradleは同梱のWrapperを使うため、別途インストールする必要はありません。初回ビルドにはインターネット接続が必要です。
+
+リポジトリのルートで実行します。
 
 ```sh
-# 配布用JARをビルド（リポジトリのルートで実行）
+# アイテム定義を編集
+python helper/item_editor.py
+
+# 保存済みJSONから定義を生成し、配布JARと公開ページを更新
 python helper/build_deliverable.py
-# JDKを明示する場合
-python helper/build_deliverable.py --java-home "C:\path\to\jdk-25"
-# 開発用クライアント起動
-./build/gradlew.bat --project-dir build --project-cache-dir intermediate/gradle-cache runClient
-# IntelliJ IDEAでbuild/build.gradleを開いてGradleプロジェクトとして読み込めます。
+
+# JDKの場所を指定する場合
+python helper/build_deliverable.py --java-home "JDKのディレクトリ"
+
+# 開発用の管理一覧を生成
+python helper/generate_item_dashboard.py
+
+# 自動テスト
+python -m unittest discover -s helper -p "test_*.py"
 ```
 
-配布物は `deliverables/downloads/culinary-expansion-26.3-0.1.0.jar` と同名の `.jar.sha256` です。ビルド失敗時はスクリプトも失敗し、配布物の生成に進みません。過去バージョンのdeliverables内のファイルは残るため、配布時は表示されたファイル名を使用してください。
+Windows・Linux・macOSで同じPythonスクリプトを使用できます。環境に応じて `python` を `python3` または `py -3` に読み替えてください。LinuxでTkinterがない場合はOSのパッケージ管理から追加してください。
 
-Windows・Linux・macOSで同じPythonスクリプトを使用します。環境によっては`python`を`python3`（Linux/macOS）または`py -3`（Windows）に読み替えてください。追加のPythonパッケージやPowerShellは不要です。Gradle WrapperをOSに応じて呼び分け、チェックサム生成と公開ページ更新まで実行します。Linux/macOSの開発用クライアント起動は`sh ./build/gradlew --project-dir build --project-cache-dir intermediate/gradle-cache runClient`です。
+アイテム編集の保存先は `source/items_project.json` です。ビルドスクリプトは保存済みJSONからJava・リソース・管理一覧を生成し、GradleでビルドしてJARを検査します。検査に成功した配布物を `deliverables/` に配置します。使用するJDKは `JAVA_HOME` または `--java-home` で指定できます。
 
-## 導入・動作確認
+操作の詳細は[アイテムエディターの開発文書](document/item_editor.md)、開発用クライアントの起動などは[開発文書](document/README.md)を参照してください。
 
-Minecraft 26.3にForge 66.0.5を導入し、生成したJARをゲームディレクトリの`mods`にコピーします。マルチプレイではサーバー・クライアント両方に同じMODを入れてください。Fabric APIなど追加MODは不要です。
+## 開発用の管理一覧
 
-1. MOD一覧にCulinary Expansionが表示されることを確認。
-2. 卵を入手して、かまどと燻製器に卵・燃料を入れ、各1個の目玉焼きができることを確認。
-3. 空腹状態で食べられること、クリエイティブの食べ物タブに表示されること、日本語設定で「目玉焼き」と表示されることを確認。
-4. コマンドで取り出す場合は `/give @s culinary_expansion:fried_egg`。
+- [アイテム一覧](document/item_dashboard.html)：編集元の定義から生成する、アイテム属性・レシピ・画像の比較用一覧です。
+- [リソース管理一覧](document/resource_dashboard.html)：定義ファイル、識別子、画像などを確認する一覧です。
 
-## 構成と拡張
+アイテムごとの最新の値は編集元JSONと生成された一覧で管理します。
 
-- `document/`: 開発用文書。
-- `deliverables/`: 公開用HTML・画像・配布JAR・チェックサム。
-- `intermediate/`: Gradleの作業用出力（クラス・一時JAR・レポート等、Git管理対象外）。
-- `intermediate/gradle-cache/`: Gradleのプロジェクトキャッシュ（Git管理対象外）。
-- `build/.gradle/`: ForgeGradleが自動生成する依存情報キャッシュ（Git管理対象外）。
-- `build/`: Gradle構成・Wrapper・ページテンプレート。
-- `helper/`: 開発補助スクリプト。
-- [リソース管理一覧](document/resource_dashboard.html): ソース・モデル・レシピ・画像ファイル等の管理用メタ情報。
-- [追加アイテム一覧](document/item_dashboard.html): レシピ・スタック数・使用効果・テクスチャ等の開発用ダッシュボード。`python helper/generate_item_dashboard.py`で再生成。
+## GitHub Pagesで配布
 
-- `source/items_project.json`: GUIエディターの編集元となる単一のアイテムプロジェクト。
-- `source/main/java/dev/lotcarnage/culinaryexpansion/ModItems.java`: 自動生成されるアイテム登録・食事性能・クリエイティブタブ登録。
-- `source/main/resources/data/culinary_expansion/recipe/`: 調理レシピ。26.3ではフォルダー名は単数形の`recipe`です。
-- `source/main/resources/data/culinary_expansion/advancement/`: レシピ本の解放条件。
-- `source/main/resources/assets/culinary_expansion/`: 翻訳・モデル・テクスチャ。
-- `build/gradle.properties`: MODバージョンとMinecraft/Forgeのバージョン。
-- `helper/build_deliverable.py`: クリーンビルド・配布用コピー・チェックサム生成。
+ローカルでビルドした `deliverables/` とルートの `.nojekyll` をコミット・pushして公開します。専用のGitHub Actionsワークフローをリポジトリに用意する必要はありません。
 
-MinecraftやForgeの対象を変更する場合は、Gradle設定に加え`META-INF/mods.toml`の依存範囲と各バージョンのAPI・データ形式も更新してください。
+GitHubの **Settings → Pages** で **Deploy from a branch**、**main / /(root)** を指定します。公開処理が完了すると、READMEのダウンロードリンクから `deliverables/index.html` にアクセスできます。
+
+既存のビルド済みJARから公開ページだけを更新する場合は、`python helper/build_deliverable.py --pages-only` を実行してください。
+
+[GitHub Pagesの公開元設定](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
+
+## ライセンス
 
 ソースコードは[MITライセンス](LICENSE)で公開しています。Forge公式MDKのGradle Wrapperを使用しています。
 
 画像素材（アイテムのテクスチャを含む）はMITライセンスの適用対象外です。画像素材の著作権その他の権利はすべて各素材の作者に帰属します。作者の許可なく、画像素材を再頒布、加工、販売その他の二次利用をすることを禁止します。
-
-公式資料: [Forge 26.3](https://files.minecraftforge.net/net/minecraftforge/forge/index_26.3.html)、[開発環境](https://docs.minecraftforge.net/en/latest/gettingstarted/)、[Forge 26.3公式MDK](https://maven.minecraftforge.net/net/minecraftforge/forge/26.3-66.0.5/forge-26.3-66.0.5-mdk.zip)。
-
-## GitHub Pagesで配布
-
-`deliverables/index.html`がダウンロードページ、`deliverables/downloads/`が配布JARとSHA-256、`deliverables/assets/`が画像です。相対リンクなのでリポジトリ配下のPages URLでも利用できます。
-
-`python helper/build_deliverable.py`はビルド成功後にPages用ファイルも更新します。既存のintermediate/gradle-output/libsからページだけ更新する場合は `python helper/build_deliverable.py --pages-only` を実行します。ページのデザイン・文章は `build/download-page.template.html` を編集してください。バージョン・ファイル名・チェックサムは `build/gradle.properties` と生成JARから自動反映されます。旧バージョンのダウンロードファイルは保持されます。
-
-公開手順:
-
-1. `deliverables/`とルートの`.nojekyll`を含む変更をGitHubの`main`ブランチにコミット・pushします。
-2. リポジトリの **Settings → Pages → Build and deployment** で **Deploy from a branch** を選択します。
-3. **main / /(root)** を選択して保存します。
-4. デプロイ完了後、[ダウンロードページ](https://lotcarnage.github.io/minecraft-culinary-expansion/deliverables/)でJARをダウンロードできます。
-
-手順の公式資料: [GitHub Pagesの公開元設定](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)。
-
-## GUIアイテムエディター
-
-`python helper/item_editor.py`で、1アイテム1行・1属性1列のテーブルで比較・選択し、別の編集ペインで値を編集してアイテムを追加・変更・削除できます。設定は`source/items_project.json`の1ファイルにまとめ、代表名からJava定義・レシピ・モデル・各種識別子を生成します。削除時も画像は保持します。
-
-操作の詳細は[アイテムエディター](document/item_editor.md)を参照してください。編集後は「定義へ反映」を実行し、`python helper/build_deliverable.py`で再ビルドしてください。
