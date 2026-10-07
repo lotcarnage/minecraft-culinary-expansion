@@ -2,11 +2,12 @@
   "category": "misc",
   "result": {
     "id": "culinary_expansion:hamburger",
-    "count": 1
+    "count": 2
   },
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     "culinary_expansion:hamburg_steak",
+    "minecraft:bread",
     "minecraft:bread"
   ]
 }

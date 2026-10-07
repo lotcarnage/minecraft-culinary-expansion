@@ -150,8 +150,8 @@
       "ja_name": "ハンバーガー",
       "en_name": "Hamburger",
       "stack_size": 64,
-      "nutrition": 0,
-      "saturation_modifier": 0.0,
+      "nutrition": 9,
+      "saturation_modifier": 0.6,
       "always_edible": false,
       "consume_seconds": 1.6,
       "effect": "なし",
@@ -167,11 +167,11 @@
       "cooking_output": 1,
       "campfire_ticks": null,
       "crafting": "不定形",
-      "crafting_output": 1,
+      "crafting_output": 2,
       "crafting_slots": [
         "culinary_expansion:hamburg_steak",
         "minecraft:bread",
-        "不要",
+        "minecraft:bread",
         "不要",
         "不要",
         "不要",
@@ -179,7 +179,7 @@
         "不要",
         "不要"
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "name": "sweet_berry_juice",
@@ -218,12 +218,12 @@
       "enabled": true
     },
     {
-      "name": "melon_juice",
-      "ja_name": "スイカジュース",
-      "en_name": "Melon Juice",
+      "name": "milk_bottle",
+      "ja_name": "牛乳瓶",
+      "en_name": "Milk Bottle",
       "stack_size": 64,
-      "nutrition": 0,
-      "saturation_modifier": 0.0,
+      "nutrition": 2,
+      "saturation_modifier": 0.4,
       "always_edible": false,
       "consume_seconds": 1.6,
       "effect": "なし",
@@ -239,55 +239,19 @@
       "cooking_output": 1,
       "campfire_ticks": null,
       "crafting": "不定形",
-      "crafting_output": 1,
+      "crafting_output": 3,
       "crafting_slots": [
-        "minecraft:melon_slice",
-        "minecraft:melon_slice",
-        "minecraft:melon_slice",
-        "minecraft:melon_slice",
-        "minecraft:melon_slice",
-        "minecraft:melon_slice",
-        "minecraft:melon_slice",
-        "minecraft:melon_slice",
-        "minecraft:glass_bottle"
-      ],
-      "enabled": false
-    },
-    {
-      "name": "milk_bottle",
-      "ja_name": "牛乳瓶",
-      "en_name": "Milk Bottle",
-      "stack_size": 64,
-      "nutrition": 0,
-      "saturation_modifier": 0.0,
-      "always_edible": false,
-      "consume_seconds": 1.6,
-      "effect": "なし",
-      "effect_ticks": 200,
-      "effect_level": 1,
-      "effect_probability": 1.0,
-      "remainder": "ガラス瓶",
-      "smelting": false,
-      "smoking": false,
-      "cooking_ticks": 200,
-      "experience": 0.35,
-      "cooking_ingredient": "minecraft:egg",
-      "cooking_output": 1,
-      "campfire_ticks": null,
-      "crafting": "クラフト不可",
-      "crafting_output": 1,
-      "crafting_slots": [
-        "不要",
-        "不要",
-        "不要",
-        "不要",
+        "minecraft:milk_bucket",
+        "minecraft:glass_bottle",
+        "minecraft:glass_bottle",
+        "minecraft:glass_bottle",
         "不要",
         "不要",
         "不要",
         "不要",
         "不要"
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "name": "milk_cocoa",
@@ -808,7 +772,6 @@
     "source/main/resources/assets/culinary_expansion/items/lard_block.json",
     "source/main/resources/assets/culinary_expansion/items/lard_grain.json",
     "source/main/resources/assets/culinary_expansion/items/loaf_bread.json",
-    "source/main/resources/assets/culinary_expansion/items/melon_juice.json",
     "source/main/resources/assets/culinary_expansion/items/milk_bottle.json",
     "source/main/resources/assets/culinary_expansion/items/milk_cocoa.json",
     "source/main/resources/assets/culinary_expansion/items/pork_block.json",
@@ -832,7 +795,6 @@
     "source/main/resources/assets/culinary_expansion/models/item/lard_block.json",
     "source/main/resources/assets/culinary_expansion/models/item/lard_grain.json",
     "source/main/resources/assets/culinary_expansion/models/item/loaf_bread.json",
-    "source/main/resources/assets/culinary_expansion/models/item/melon_juice.json",
     "source/main/resources/assets/culinary_expansion/models/item/milk_bottle.json",
     "source/main/resources/assets/culinary_expansion/models/item/milk_cocoa.json",
     "source/main/resources/assets/culinary_expansion/models/item/pork_block.json",
@@ -854,7 +816,6 @@
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/lard_block_from_smelting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/lard_grain_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/loaf_bread_from_crafting.json",
-    "source/main/resources/data/culinary_expansion/advancement/recipes/food/melon_juice_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/milk_cocoa_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/pork_block_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/raw_french_fries_from_crafting.json",
@@ -874,7 +835,6 @@
     "source/main/resources/data/culinary_expansion/recipe/lard_block_from_smelting.json",
     "source/main/resources/data/culinary_expansion/recipe/lard_grain_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/loaf_bread_from_crafting.json",
-    "source/main/resources/data/culinary_expansion/recipe/melon_juice_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/milk_cocoa_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/pork_block_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/raw_french_fries_from_crafting.json",
@@ -933,5 +893,5 @@
     "vanilla_recipes": "既存レシピを置換せず、専用アイテムと材料の組み合わせで追加します。",
     "provisional_properties": "追加アイテムの食料値は未決定のため0に仮設定しています。ブロック名のアイテムの設置可否は未決定です。"
   },
-  "version": "0.1.1"
+  "version": "0.1.2"
 }

@@ -159,5 +159,13 @@ class ProjectTests(unittest.TestCase):
         for version in ('','../outside','1/2','1:2',None):
             loaded['version']=version
             with self.assertRaises(ValueError):m.validate(loaded)
+    def test_expanded_effects_generate_consumption_effects(self):
+        for effect in ('INSTANT_HEALTH','SATURATION','TRIAL_OMEN','WIND_CHARGED','BREATH_OF_THE_NAUTILUS'):
+            label=next(label for label,value in m.EFFECTS.items() if value==effect)
+            self.project['items'][0].update(effect=label,effect_ticks=120,effect_level=2,effect_probability=0.5)
+            m.validate(self.project)
+            java=m.generated(self.project,self.root)[m.JAVA+'ModItems.java'].decode()
+            self.assertIn(f'MobEffects.{effect}, 120, 1',java)
+            self.assertIn('0.5F)',java)
 
 if __name__=='__main__':unittest.main()

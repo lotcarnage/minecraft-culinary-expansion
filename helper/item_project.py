@@ -14,8 +14,49 @@ NS = 'culinary_expansion'
 JAVA = 'source/main/java/dev/lotcarnage/culinaryexpansion/'
 ASSETS = f'source/main/resources/assets/{NS}/'
 DATA = f'source/main/resources/data/{NS}/'
-EFFECTS = {'なし': None, '移動速度上昇': 'SPEED', '再生能力': 'REGENERATION', '耐火': 'FIRE_RESISTANCE',
-           '暗視': 'NIGHT_VISION', '攻撃力上昇': 'STRENGTH', '毒': 'POISON', '空腹': 'HUNGER', '衰弱': 'WITHER'}
+EFFECTS = {
+    'なし': None,
+    '移動速度上昇': 'SPEED',
+    '再生能力': 'REGENERATION',
+    '耐火': 'FIRE_RESISTANCE',
+    '暗視': 'NIGHT_VISION',
+    '攻撃力上昇': 'STRENGTH',
+    '毒': 'POISON',
+    '空腹': 'HUNGER',
+    '衰弱': 'WITHER',
+    '移動速度低下': 'SLOWNESS',
+    '採掘速度上昇': 'HASTE',
+    '採掘速度低下': 'MINING_FATIGUE',
+    '即時回復': 'INSTANT_HEALTH',
+    '即時ダメージ': 'INSTANT_DAMAGE',
+    '跳躍力上昇': 'JUMP_BOOST',
+    '吐き気': 'NAUSEA',
+    '耐性': 'RESISTANCE',
+    '水中呼吸': 'WATER_BREATHING',
+    '透明化': 'INVISIBILITY',
+    '盲目': 'BLINDNESS',
+    '弱体化': 'WEAKNESS',
+    '体力増強': 'HEALTH_BOOST',
+    '衝撃吸収': 'ABSORPTION',
+    '満腹度回復': 'SATURATION',
+    '発光': 'GLOWING',
+    '浮遊': 'LEVITATION',
+    '幸運': 'LUCK',
+    '不運': 'UNLUCK',
+    '落下速度低下': 'SLOW_FALLING',
+    'コンジットパワー': 'CONDUIT_POWER',
+    'イルカの好意': 'DOLPHINS_GRACE',
+    '不吉な予感': 'BAD_OMEN',
+    '村の英雄': 'HERO_OF_THE_VILLAGE',
+    '暗闇': 'DARKNESS',
+    '試練の予感': 'TRIAL_OMEN',
+    '襲撃の予感': 'RAID_OMEN',
+    '蓄風': 'WIND_CHARGED',
+    '巣張り': 'WEAVING',
+    '滲出': 'OOZING',
+    '虫食い': 'INFESTED',
+    'オウムガイの息吹': 'BREATH_OF_THE_NAUTILUS',
+}
 REMAINDERS = {'なし': None, 'ボウル': 'BOWL', 'ガラス瓶': 'GLASS_BOTTLE', 'バケツ': 'BUCKET'}
 SLOTS = [f'{r}:{c}' for r in range(1, 4) for c in range(1, 4)]
 
