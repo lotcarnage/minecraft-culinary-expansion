@@ -6,7 +6,7 @@ Minecraft Java Edition向けに、料理系のアイテムとレシピを拡張�
 
 **[ダウンロードページを開く](https://lotcarnage.github.io/minecraft-culinary-expansion/deliverables/)**
 
-配布JAR、対応バージョン、チェックサム、導入手順はダウンロードページを参照してください。料理の効果・回復量・材料・クラフト配置は [料理図鑑](deliverables/foods.html) で検索・比較できます。
+配布JAR、対応バージョン、チェックサム、導入手順はダウンロードページを参照してください。MODに含まれる料理の紹介と、効果・回復量・材料・クラフト配置は [料理図鑑](https://lotcarnage.github.io/minecraft-culinary-expansion/deliverables/foods.html) で検索・比較できます。
 
 ページの生成元は `build/download-page.template.html`、公開ファイルは `deliverables/index.html` です。
 
