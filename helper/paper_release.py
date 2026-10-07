@@ -24,7 +24,7 @@ def input_digest(root, config):
 def generate(root, config):
     project = item_project.load(root / 'source/items_project.json')
     enabled = {item['name'] for item in project['items'] if item['enabled']}
-    generated = root / 'intermediate/paper-generated'
+    generated = root / ('intermediate/paper-generated' + config.get('output_suffix', ''))
     if generated.exists():
         # Never follow a redirected generated directory outside the working area.
         generated.resolve().relative_to((root / 'intermediate').resolve())
@@ -86,7 +86,7 @@ def generate(root, config):
     java = generated / 'java/dev/lotcarnage/culinaryexpansion/paper/GeneratedContent.java'
     java.parent.mkdir(parents=True)
     java.write_text('\n'.join(lines) + '\n', encoding='utf-8')
-    pack = root / 'intermediate/paper-generated' / pack_name(config)
+    pack = root / ('intermediate/paper-generated' + config.get('output_suffix', '')) / pack_name(config)
     pack.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(pack, 'w', zipfile.ZIP_DEFLATED) as archive:
         archive.writestr('release-inputs.sha256', fingerprint)
@@ -114,8 +114,8 @@ def pack_name(config):
 
 
 def prepare(root, config):
-    jar = root / 'intermediate/paper-output/libs' / jar_name(config)
-    pack = root / 'intermediate/paper-generated' / pack_name(config)
+    jar = root / ('intermediate/paper-output' + config.get('output_suffix', '')) / 'libs' / jar_name(config)
+    pack = root / ('intermediate/paper-generated' + config.get('output_suffix', '')) / pack_name(config)
     with zipfile.ZipFile(jar) as archive:
         for entry in ('dev/lotcarnage/culinaryexpansion/paper/CulinaryExpansionPlugin.class',
                       'dev/lotcarnage/culinaryexpansion/paper/GeneratedContent.class', 'plugin.yml',

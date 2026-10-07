@@ -42,6 +42,44 @@ class RecipeCategoryTests(unittest.TestCase):
 
 
 class ReleaseTests(unittest.TestCase):
+    def test_legacy_config_uses_isolated_outputs_and_shared_mod_version(self):
+        current = release.properties()
+        legacy = release.properties('26.2')
+        self.assertEqual(legacy['mod_version'], current['mod_version'])
+        self.assertEqual(legacy['minecraft_version'], '26.2')
+        self.assertEqual(legacy['output_suffix'], '-26.2')
+        self.assertTrue(legacy['forge_version'].startswith('65.'))
+        self.assertTrue(legacy['paper_api_version'].startswith('26.2.'))
+        with self.assertRaisesRegex(ValueError, 'Unsupported Minecraft version'):
+            release.properties('1.0')
+
+    def test_legacy_links_are_text_only_and_survive_regeneration(self):
+        import hashlib
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            downloads = root / 'deliverables/downloads'
+            downloads.mkdir(parents=True)
+            page = root / 'deliverables/index.html'
+            page.write_text('<main><!-- LEGACY SLOT --><footer></footer></main>', encoding='utf-8')
+            for name in ('culinary-expansion-26.2-0.1.4.jar',
+                         'culinary-expansion-paper-26.2-0.1.4.jar',
+                         'culinary-expansion-paper-resources-26.2-0.1.4.zip',
+                         'culinary-expansion-26.3-0.1.4.jar'):
+                (downloads / name).write_bytes(b'archive')
+                (downloads / (name + '.sha256')).write_text(hashlib.sha256(b'archive').hexdigest() + '  ' + name)
+            with patch.object(release, 'ROOT', root):
+                release.refresh_legacy_links({'minecraft_version': '26.3'})
+                release.refresh_legacy_links({'minecraft_version': '26.3'})
+            text = page.read_text(encoding='utf-8')
+            self.assertEqual(text.count('id="legacy-title"'), 1)
+            self.assertEqual(text.count('<li>'), 3)
+            self.assertNotIn('class="button"', text)
+            self.assertNotIn('26.3', text)
+            (downloads / 'culinary-expansion-26.2-0.1.4.jar').write_bytes(b'stale')
+            with patch.object(release, 'ROOT', root):
+                with self.assertRaisesRegex(ValueError, 'invalid legacy hash'):
+                    release.refresh_legacy_links({'minecraft_version': '26.3'})
+
     def test_package_version_comes_from_project_metadata(self):
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp)

@@ -14,7 +14,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def properties():
+def properties(minecraft_version=None):
     values = {}
     for line in (ROOT / 'build/gradle.properties').read_text(encoding='utf-8-sig').splitlines():
         line = line.strip()
@@ -23,6 +23,13 @@ def properties():
             values[key.strip()] = value.strip()
     import item_project
     values['mod_version'] = item_project.load(ROOT / 'source/items_project.json')['version']
+    if minecraft_version and minecraft_version != values['minecraft_version']:
+        versions = json.loads((ROOT / 'build/legacy-versions.json').read_text(encoding='utf-8-sig'))
+        if minecraft_version not in versions:
+            raise ValueError('Unsupported Minecraft version: ' + minecraft_version)
+        values.update(versions[minecraft_version])
+        values['minecraft_version'] = minecraft_version
+        values['output_suffix'] = '-' + minecraft_version
     return values
 
 
@@ -38,7 +45,7 @@ def validate_recipe_category(recipe, name):
         raise ValueError(f'Invalid recipe category in {name}: {recipe.get("category")}')
 
 
-def validate_mod_archive(artifact):
+def validate_mod_archive(artifact, config=None):
     """Reject incomplete archives before copying them to the public directory."""
     java_root = ROOT / 'source/main/java'
     resources_root = ROOT / 'source/main/resources'
@@ -76,11 +83,19 @@ def validate_mod_archive(artifact):
             missing = required - set(archive.namelist())
             if missing:
                 raise ValueError('Incomplete mod JAR; missing: ' + ', '.join(sorted(missing)))
+            def expected(path):
+                data = path.read_bytes()
+                if path.name == 'mods.toml':
+                    active = config or properties()
+                    data = data.replace(b'${mod_version}', active['mod_version'].encode())
+                    if active.get('minecraft_version') == '26.2':
+                        data = data.replace(b'[66,)', b'[65,)').replace(b'[66.0.5,67)',
+                            ('[' + active['forge_version'] + ',66)').encode()).replace(b'[26.3,26.4)', b'[26.2,26.3)')
+                return data
             stale = [path.relative_to(resources_root).as_posix()
                      for path in resource_files
                      if archive.read(path.relative_to(resources_root).as_posix()) !=
-                     (path.read_bytes().replace(b'${mod_version}', properties()['mod_version'].encode())
-                      if path.name == 'mods.toml' else path.read_bytes())]
+                     expected(path)]
             if stale:
                 raise ValueError('Outdated mod JAR resources; rebuild required: ' + ', '.join(sorted(stale)))
             corrupt = archive.testzip()
@@ -157,7 +172,8 @@ def prepare_pages():
     print(f'GitHub Pages files: {ROOT / "deliverables"}')
 
 
-def build(java_home, platform='forge'):
+def build(java_home, platform='forge', config=None):
+    config = config or properties()
     env = os.environ.copy()
     # Reuse a project-local portable JDK when the Windows PATH still points to Java 8.
     if not java_home and not env.get('JAVA_HOME'):
@@ -191,46 +207,104 @@ def build(java_home, platform='forge'):
         generate_item_dashboard.generate(ROOT / 'document/item_dashboard.html')
     command = ([str(ROOT / 'build/gradlew.bat')] if os.name == 'nt'
                else ['sh', str(ROOT / 'build/gradlew')])
+    overrides = ['-P' + key + '=' + config[key] for key in
+                 ('minecraft_version', 'forge_version', 'paper_api_version', 'output_suffix') if key in config]
     if platform in ('forge', 'all'):
         subprocess.run(command + ['--no-daemon', '--project-dir', str(ROOT / 'build'),
                               '--project-cache-dir', str(ROOT / 'intermediate/gradle-cache'),
-                              'clean', 'build'], cwd=ROOT, env=env, check=True)
+                              'clean', 'build'] + overrides, cwd=ROOT, env=env, check=True)
     if platform in ('paper', 'all'):
         import paper_release
-        paper_release.generate(ROOT, properties())
+        paper_release.generate(ROOT, config)
         subprocess.run(command + ['--no-daemon', '--project-dir', str(ROOT / 'build/paper'),
                                   '--project-cache-dir', str(ROOT / 'intermediate/paper-gradle-cache'),
-                                  'clean', 'build'], cwd=ROOT, env=env, check=True)
+                                  'clean', 'build'] + overrides, cwd=ROOT, env=env, check=True)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--java-home', help='JDK 25 directory (defaults to JAVA_HOME or PATH)')
-    parser.add_argument('--pages-only', action='store_true', help='Prepare the page from an existing intermediate/gradle-output/libs JAR')
+    parser.add_argument('--pages-only', action='store_true', help='Prepare pages from existing artifacts for the selected Minecraft versions')
     parser.add_argument('--platform', choices=('forge', 'paper', 'all'), default='forge',
                         help='Build/release Forge, Paper, or both (default: forge)')
+    parser.add_argument('--minecraft-version', default='all',
+                        help='Minecraft target (default: all configured versions)')
     args = parser.parse_args()
     try:
+        current = properties()
+        legacy_versions = json.loads((ROOT / 'build/legacy-versions.json').read_text(encoding='utf-8-sig'))
+        targets = [current['minecraft_version']] + list(legacy_versions) if args.minecraft_version == 'all' else [args.minecraft_version]
+        configs = [properties(target) for target in targets]
         if not args.pages_only:
             print('Generating resources and building the mod...', flush=True)
-            if args.platform == 'forge':
-                build(args.java_home)
-            else:
-                build(args.java_home, args.platform)
+            for config in configs:
+                build(args.java_home, args.platform, config)
+        import paper_release
+        legacy_artifacts = []
         paper_artifacts = None
-        if args.platform in ('paper', 'all'):
-            import paper_release
-            paper_artifacts = paper_release.prepare(ROOT, properties())
-        if args.platform in ('forge', 'all'):
+        for config in configs:
+            is_current = config['minecraft_version'] == current['minecraft_version']
+            if args.platform in ('forge', 'all'):
+                name = f"culinary-expansion-{config['minecraft_version']}-{config['mod_version']}.jar"
+                artifact = ROOT / ('intermediate/gradle-output' + config.get('output_suffix', '')) / 'libs' / name
+                validate_mod_archive(artifact, config)
+                if not is_current:
+                    legacy_artifacts.append(artifact)
+            if args.platform in ('paper', 'all'):
+                artifacts = paper_release.prepare(ROOT, config)
+                if is_current:
+                    paper_artifacts = artifacts
+                else:
+                    legacy_artifacts.extend(artifacts)
+        if current['minecraft_version'] in targets and args.platform in ('forge', 'all'):
             prepare_pages()
         if paper_artifacts:
-            paper_release.publish(ROOT, properties(), paper_artifacts)
+            paper_release.publish(ROOT, current, paper_artifacts)
+        downloads = ROOT / 'deliverables/downloads'
+        downloads.mkdir(parents=True, exist_ok=True)
+        for artifact in legacy_artifacts:
+            shutil.copyfile(artifact, downloads / artifact.name)
+            digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+            (downloads / (artifact.name + '.sha256')).write_text(f'{digest}  {artifact.name}\n', encoding='utf-8')
+            print(f'Legacy distribution: {downloads / artifact.name}')
+        refresh_legacy_links(current)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         print(f'Build failed: {error}', file=sys.stderr)
         print('Release generation stopped. Existing deliverables may be older; do not use them as this build output.', file=sys.stderr)
         return 1
     print('Release process completed successfully.', flush=True)
     return 0
+
+
+def refresh_legacy_links(config):
+    page = ROOT / 'deliverables/index.html'
+    if not page.exists():
+        return
+    links = []
+    pattern = r'culinary-expansion-(?:(paper)(-resources)?-)?(\d+\.\d+(?:\.\d+)?)-(.+)\.(jar|zip)'
+    for artifact in sorted((ROOT / 'deliverables/downloads').iterdir()):
+        match = re.fullmatch(pattern, artifact.name)
+        if not match or match[3] == config['minecraft_version']:
+            continue
+        checksum = artifact.with_name(artifact.name + '.sha256')
+        if not checksum.exists() or checksum.read_text().split()[0] != hashlib.sha256(artifact.read_bytes()).hexdigest():
+            raise ValueError('Missing or invalid legacy hash: ' + artifact.name)
+        label = 'PaperMC リソースパック' if match[2] else 'PaperMC プラグイン' if match[1] else 'Forge MOD'
+        name = html.escape(artifact.name)
+        links.append(f'<li>Minecraft {html.escape(match[3])} · {label}（v{html.escape(match[4])}）：'
+                     f'<a href="downloads/{name}" download>{name}</a> · '
+                     f'<a href="downloads/{name}.sha256" download>ハッシュ値</a></li>')
+    section = ('<!-- LEGACY START -->\n<section class="page-section" aria-labelledby="legacy-title">\n'
+               '<h2 class="section-title" id="legacy-title">旧バージョンのダウンロード</h2>\n<ul>\n' +
+               '\n'.join(links) + '\n</ul>\n</section>\n<!-- LEGACY END -->') if links else '<!-- LEGACY SLOT -->'
+    text = page.read_text(encoding='utf-8')
+    if '<!-- LEGACY START -->' in text:
+        text = re.sub(r'<!-- LEGACY START -->.*?<!-- LEGACY END -->', lambda _: section, text, flags=re.S)
+    elif '<!-- LEGACY SLOT -->' in text:
+        text = text.replace('<!-- LEGACY SLOT -->', section)
+    else:
+        text = text.replace('<footer>', section + '\n<footer>')
+    page.write_text(text, encoding='utf-8')
 
 
 if __name__ == '__main__':

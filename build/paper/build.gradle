@@ -1,7 +1,11 @@
 plugins { id 'java' }
-layout.buildDirectory = layout.projectDirectory.dir('../../intermediate/paper-output')
+def outputSuffix = providers.gradleProperty('output_suffix').getOrElse('')
+layout.buildDirectory = layout.projectDirectory.dir('../../intermediate/paper-output' + outputSuffix)
 def config = new Properties()
 file('../gradle.properties').withInputStream { config.load(it) }
+['minecraft_version', 'paper_api_version'].each { key ->
+    if (project.hasProperty(key)) config[key] = project.property(key)
+}
 version = new groovy.json.JsonSlurper().parse(file('../../source/items_project.json')).version
 group = 'dev.lotcarnage.culinaryexpansion'
 base { archivesName = "culinary-expansion-paper-${config.minecraft_version}" }
@@ -12,8 +16,8 @@ repositories {
 }
 dependencies { compileOnly "io.papermc.paper:paper-api:${config.paper_api_version}" }
 sourceSets.main {
-    java.setSrcDirs(['../../source/paper/java', '../../intermediate/paper-generated/java'])
-    resources.setSrcDirs(['../../intermediate/paper-generated/resources'])
+    java.setSrcDirs(['../../source/paper/java', '../../intermediate/paper-generated' + outputSuffix + '/java'])
+    resources.setSrcDirs(['../../intermediate/paper-generated' + outputSuffix + '/resources'])
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 tasks.named('jar') { from('../../LICENSE') }

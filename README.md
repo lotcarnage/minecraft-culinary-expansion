@@ -42,6 +42,9 @@ python helper/build_deliverable.py --platform all
 # PaperMC版のみビルド（Forge環境の取得は不要）
 python helper/build_deliverable.py --platform paper
 
+# Minecraft 26.2だけをビルド
+python helper/build_deliverable.py --platform all --minecraft-version 26.2
+
 # JDKの場所を指定する場合
 python helper/build_deliverable.py --java-home "JDKのディレクトリ"
 
@@ -79,9 +82,13 @@ GitHubの **Settings → Pages** で **Deploy from a branch**、**main / /(root)
 
 ## PaperMC版
 
+Minecraftのビルド対象は既定で26.3と26.2です。`--minecraft-version 26.3`または`26.2`で対象を限定できます。26.2用のForge・Paper APIバージョンは`build/legacy-versions.json`で管理します。プロジェクトのバージョンは両対象で共通です。26.2の中間成果物は`intermediate/gradle-output-26.2/`、`paper-output-26.2/`、`paper-generated-26.2/`に分離し、Forgeの依存範囲とPaperのAPIバージョンを対象に合わせて生成します。選択したすべての対象のビルドと検査が成功してから配布物を更新します。
+
+配布ページ上部のペインは26.3用です。26.2用のJAR・リソースパックとハッシュ値ファイルは、ページ下部の「旧バージョンのダウンロード」にテキストリンクで列挙します。既存の旧版配布物も、ハッシュ値を検査して掲載します。
+
 `--platform`は`forge`（既定）、`paper`、`all`を指定できます。`all`では両方のビルドと成果物の検査に成功した後に配布物を更新します。`--pages-only --platform all`で両方の既存成果物からページを再生成できます。片方だけ更新した場合も、公開ページのもう片方のダウンロード欄を保持します。
 
-Paper版はMinecraft 26.3・Java 25向けです。Paper APIの固定バージョンは`build/gradle.properties`の`paper_api_version`で管理します。Gradle構成は`build/paper/`、プラグインの実装は`source/paper/java/`、共通JSONからの生成処理は`helper/paper_release.py`です。生成Java・プラグイン定義・リソースパックは`intermediate/paper-generated/`、ビルド済みJARは`intermediate/paper-output/libs/`に保存します。通常は上記のPythonスクリプトで生成とビルドをまとめて実行してください。
+Paper版はMinecraft 26.3／26.2・Java 25向けです。Paper APIの固定バージョンは`build/gradle.properties`の`paper_api_version`で管理します。Gradle構成は`build/paper/`、プラグインの実装は`source/paper/java/`、共通JSONからの生成処理は`helper/paper_release.py`です。生成Java・プラグイン定義・リソースパックは`intermediate/paper-generated/`、ビルド済みJARは`intermediate/paper-output/libs/`に保存します。通常は上記のPythonスクリプトで生成とビルドをまとめて実行してください。
 
 `deliverables/downloads/`に次のファイルと、それぞれのSHA-256ファイルを生成します。
 

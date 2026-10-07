@@ -6,7 +6,8 @@ plugins {
 }
 
 // Keep generated working files separate from source and release deliverables.
-layout.buildDirectory = layout.projectDirectory.dir('../intermediate/gradle-output')
+def outputSuffix = providers.gradleProperty('output_suffix').getOrElse('')
+layout.buildDirectory = layout.projectDirectory.dir('../intermediate/gradle-output' + outputSuffix)
 
 def itemProjectFile = file('../source/items_project.json')
 def projectMetadata = new groovy.json.JsonSlurper().parse(itemProjectFile)
@@ -68,7 +69,16 @@ tasks.named('processResources', ProcessResources).configure {
         }
         return false
     }
-    filesMatching('META-INF/mods.toml') { expand mod_version: projectVersion }
+    filesMatching('META-INF/mods.toml') {
+        expand mod_version: projectVersion
+        filter { line ->
+            if (minecraft_version == '26.2') {
+                line = line.replace('[66,)', '[65,)').replace('[66.0.5,67)', "[${forge_version},66)")
+                           .replace('[26.3,26.4)', '[26.2,26.3)')
+            }
+            line
+        }
+    }
 }
 tasks.named('jar', Jar).configure { from('../LICENSE') }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
