@@ -8,7 +8,13 @@ plugins {
 // Keep generated working files separate from source and release deliverables.
 layout.buildDirectory = layout.projectDirectory.dir('../intermediate/gradle-output')
 
-version = mod_version
+def itemProjectFile = file('../source/items_project.json')
+def projectMetadata = new groovy.json.JsonSlurper().parse(itemProjectFile)
+def projectVersion = projectMetadata.containsKey('version') ? projectMetadata.version : '0.1.0'
+if (!(projectVersion instanceof String) || !(projectVersion ==~ /[A-Za-z0-9][A-Za-z0-9._+\-]{0,63}/)) {
+    throw new GradleException('Invalid project version in source/items_project.json')
+}
+version = projectVersion
 group = 'dev.lotcarnage.culinaryexpansion'
 base { archivesName = "culinary-expansion-${minecraft_version}" }
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
@@ -34,8 +40,26 @@ dependencies {
     annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.6'
 }
 tasks.named('processResources', ProcessResources).configure {
-    inputs.property 'mod_version', mod_version
-    filesMatching('META-INF/mods.toml') { expand mod_version: mod_version }
+    inputs.property 'mod_version', projectVersion
+    def itemProject = file('../source/items_project.json')
+    inputs.file(itemProject)
+    def projectItems = new groovy.json.JsonSlurper().parse(itemProject).items
+    def disabledNames = projectItems.findAll { !it.enabled }.collect { it.name } as Set
+    exclude { details ->
+        def path = details.path
+        if (path.startsWith('assets/culinary_expansion/items/') ||
+            path.startsWith('assets/culinary_expansion/models/item/') ||
+            path.startsWith('assets/culinary_expansion/textures/item/')) {
+            return disabledNames.contains(details.file.name.replaceFirst(/\.[^.]+$/, ''))
+        }
+        if ((path.startsWith('data/culinary_expansion/recipe/') ||
+             path.startsWith('data/culinary_expansion/advancement/recipes/food/')) && path.endsWith('.json')) {
+            def text = details.file.getText('UTF-8')
+            return disabledNames.any { text.contains('"culinary_expansion:' + it + '"') }
+        }
+        return false
+    }
+    filesMatching('META-INF/mods.toml') { expand mod_version: projectVersion }
 }
 tasks.named('jar', Jar).configure { from('../LICENSE') }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }

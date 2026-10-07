@@ -1,0 +1,12 @@
+{
+  "category": "misc",
+  "result": {
+    "id": "culinary_expansion:raw_meat_patty",
+    "count": 2
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:beef",
+    "minecraft:porkchop"
+  ]
+}

@@ -19,7 +19,7 @@ Minecraft Java Edition向けに、料理系のアイテムとレシピを拡張�
 | `deliverables/` | 公開用HTML、画像、配布JAR、チェックサム。 |
 | `intermediate/` | クラス、一時JAR、キャッシュ、レポートなどの中間成果物。Git管理対象外。 |
 
-Minecraft・Forge・MODのバージョンは `build/gradle.properties`、依存範囲は `source/main/resources/META-INF/mods.toml` で管理します。
+Minecraft・Forgeのバージョンは `build/gradle.properties`、MODのバージョンは `source/items_project.json` の `version`、依存範囲は `source/main/resources/META-INF/mods.toml` で管理します。MODのバージョンは人間が必要に応じて更新するメタ情報で、自動更新しません。JAR名は `culinary-expansion-<Minecraftバージョン>-<プロジェクトバージョン>.jar` です。
 
 ## 開発とビルド
 
@@ -47,6 +47,10 @@ python -m unittest discover -s helper -p "test_*.py"
 Windows・Linux・macOSで同じPythonスクリプトを使用できます。環境に応じて `python` を `python3` または `py -3` に読み替えてください。LinuxでTkinterがない場合はOSのパッケージ管理から追加してください。
 
 アイテム編集の保存先は `source/items_project.json` です。ビルドスクリプトは保存済みJSONからJava・リソース・管理一覧を生成し、GradleでビルドしてJARを検査します。検査に成功した配布物を `deliverables/` に配置します。使用するJDKは `JAVA_HOME` または `--java-home` で指定できます。
+
+配布物生成の順序は「JSONから生成 → Gradleビルド → JAR検査 → `deliverables/downloads/`とチェックサム・配布ページを更新」です。このスクリプトの操作はリポジトリ内に閉じ、Minecraftのゲームフォルダへのインストールは行いません。完了メッセージと終了コード0を確認してください。失敗時は以後の工程を実行せず、古い配布物が残っていても今回の生成結果として扱いません。
+
+WindowsのPATHがJava 8を指している場合も、`intermediate/jdk25/`以下に展開済みのJDK 25があれば自動で使います。Gradleのキャッシュは`intermediate/gradle-user-home/`に保存します（`GRADLE_USER_HOME`指定時はその値を優先します）。Pythonファイルの関連付けに依存せず、上記のように`python helper/build_deliverable.py`で実行してください。
 
 操作の詳細は[アイテムエディターの開発文書](document/item_editor.md)、開発用クライアントの起動などは[開発文書](document/README.md)を参照してください。
 

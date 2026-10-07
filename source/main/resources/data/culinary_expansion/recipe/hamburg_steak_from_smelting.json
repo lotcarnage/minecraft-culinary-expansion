@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "culinary_expansion:raw_meat_patty",
+  "result": {
+    "id": "culinary_expansion:hamburg_steak",
+    "count": 1
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

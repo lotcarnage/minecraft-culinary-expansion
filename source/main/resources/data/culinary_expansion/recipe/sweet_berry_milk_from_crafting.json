@@ -1,0 +1,12 @@
+{
+  "category": "misc",
+  "result": {
+    "id": "culinary_expansion:sweet_berry_milk",
+    "count": 1
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "culinary_expansion:milk_bottle",
+    "minecraft:sweet_berries"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipes": "culinary_expansion:salt_from_crafting"
+      }
+    },
+    "has_material_0": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "culinary_expansion:salt_bucket"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_material_0"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "culinary_expansion:salt_from_crafting"
+    ]
+  }
+}

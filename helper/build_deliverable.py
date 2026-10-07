@@ -21,6 +21,8 @@ def properties():
         if line and not line.startswith(('#', '!')) and '=' in line:
             key, value = line.split('=', 1)
             values[key.strip()] = value.strip()
+    import item_project
+    values['mod_version'] = item_project.load(ROOT / 'source/items_project.json')['version']
     return values
 
 
@@ -40,16 +42,41 @@ def validate_mod_archive(artifact):
     """Reject incomplete archives before copying them to the public directory."""
     java_root = ROOT / 'source/main/java'
     resources_root = ROOT / 'source/main/resources'
+    project_path = ROOT / 'source/items_project.json'
+    disabled = {item['name'] for item in json.loads(project_path.read_text(encoding='utf-8-sig'))['items']
+                if not item.get('enabled', item['nutrition'] > 0)} if project_path.exists() else set()
+    def included(path):
+        relative = path.relative_to(resources_root).as_posix()
+        if relative.startswith(('assets/culinary_expansion/items/', 'assets/culinary_expansion/models/item/',
+                                'assets/culinary_expansion/textures/item/')):
+            return path.stem not in disabled
+        if relative.startswith(('data/culinary_expansion/recipe/', 'data/culinary_expansion/advancement/recipes/food/')) and path.suffix == '.json':
+            text = path.read_text(encoding='utf-8')
+            return not any('"culinary_expansion:' + name + '"' in text for name in disabled)
+        return True
+    resource_files = [path for path in resources_root.rglob('*') if path.is_file() and included(path)]
     required = {'META-INF/mods.toml', 'dev/lotcarnage/culinaryexpansion/CulinaryExpansion.class'}
     required.update(path.relative_to(java_root).with_suffix('.class').as_posix()
                     for path in java_root.rglob('*.java'))
     required.update(path.relative_to(resources_root).as_posix()
-                    for path in resources_root.rglob('*') if path.is_file())
+                    for path in resource_files)
     try:
         with zipfile.ZipFile(artifact) as archive:
+            excluded = {path.relative_to(resources_root).as_posix() for path in resources_root.rglob('*')
+                        if path.is_file() and not included(path)}
+            unwanted = excluded & set(archive.namelist())
+            if unwanted:
+                raise ValueError('Disabled item resources in mod JAR: ' + ', '.join(sorted(unwanted)))
             missing = required - set(archive.namelist())
             if missing:
                 raise ValueError('Incomplete mod JAR; missing: ' + ', '.join(sorted(missing)))
+            stale = [path.relative_to(resources_root).as_posix()
+                     for path in resource_files
+                     if archive.read(path.relative_to(resources_root).as_posix()) !=
+                     (path.read_bytes().replace(b'${mod_version}', properties()['mod_version'].encode())
+                      if path.name == 'mods.toml' else path.read_bytes())]
+            if stale:
+                raise ValueError('Outdated mod JAR resources; rebuild required: ' + ', '.join(sorted(stale)))
             corrupt = archive.testzip()
             if corrupt:
                 raise ValueError(f'Corrupt mod JAR entry: {corrupt}')
@@ -99,6 +126,12 @@ def prepare_pages():
 
 def build(java_home):
     env = os.environ.copy()
+    # Reuse a project-local portable JDK when the Windows PATH still points to Java 8.
+    if not java_home and not env.get('JAVA_HOME'):
+        candidates = sorted((ROOT / 'intermediate/jdk25').glob('*/bin/javac.exe'))
+        if candidates:
+            java_home = candidates[-1].parent.parent
+    env.setdefault('GRADLE_USER_HOME', str(ROOT / 'intermediate/gradle-user-home'))
     if java_home:
         home = Path(java_home).expanduser().resolve()
         env['JAVA_HOME'] = str(home)
@@ -137,11 +170,14 @@ def main():
     args = parser.parse_args()
     try:
         if not args.pages_only:
+            print('Generating resources and building the mod...', flush=True)
             build(args.java_home)
         prepare_pages()
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         print(f'Build failed: {error}', file=sys.stderr)
+        print('Release generation stopped. Existing deliverables may be older; do not use them as this build output.', file=sys.stderr)
         return 1
+    print('Release process completed successfully.', flush=True)
     return 0
 
 

@@ -1,0 +1,12 @@
+{
+  "category": "misc",
+  "result": {
+    "id": "culinary_expansion:raw_french_fries",
+    "count": 1
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:potato",
+    "culinary_expansion:lard_grain"
+  ]
+}

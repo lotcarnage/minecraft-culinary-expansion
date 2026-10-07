@@ -1,0 +1,16 @@
+{
+  "category": "misc",
+  "result": {
+    "id": "culinary_expansion:loaf_bread",
+    "count": 1
+  },
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "AAA",
+    "AAA",
+    "AAA"
+  ],
+  "key": {
+    "A": "minecraft:wheat"
+  }
+}

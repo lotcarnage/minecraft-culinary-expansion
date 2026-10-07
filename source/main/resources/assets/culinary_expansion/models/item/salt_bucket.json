@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "culinary_expansion:item/salt_bucket"
+  }
+}

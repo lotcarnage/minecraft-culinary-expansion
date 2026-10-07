@@ -1,4 +1,8 @@
 {
   "item.culinary_expansion.fried_egg": "目玉焼き",
-  "item.culinary_expansion.chocolate": "チョコレート"
+  "item.culinary_expansion.chocolate": "チョコレート",
+  "item.culinary_expansion.raw_meat_patty": "生のミートパティ",
+  "item.culinary_expansion.hamburg_steak": "ハンバーグ",
+  "item.culinary_expansion.sweet_berry_juice": "スイートベリージュース",
+  "item.culinary_expansion.loaf_bread": "食パン"
 }

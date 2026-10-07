@@ -1,0 +1,15 @@
+{
+  "category": "misc",
+  "result": {
+    "id": "culinary_expansion:french_fries",
+    "count": 3
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "culinary_expansion:fresh_french_fries",
+    "minecraft:paper",
+    "minecraft:paper",
+    "minecraft:paper",
+    "culinary_expansion:salt"
+  ]
+}

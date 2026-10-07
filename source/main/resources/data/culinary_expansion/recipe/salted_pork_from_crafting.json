@@ -1,0 +1,19 @@
+{
+  "category": "misc",
+  "result": {
+    "id": "culinary_expansion:salted_pork",
+    "count": 8
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:porkchop",
+    "minecraft:porkchop",
+    "minecraft:porkchop",
+    "minecraft:porkchop",
+    "minecraft:porkchop",
+    "minecraft:porkchop",
+    "minecraft:porkchop",
+    "minecraft:porkchop",
+    "culinary_expansion:salt"
+  ]
+}

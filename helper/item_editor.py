@@ -4,11 +4,13 @@ from copy import deepcopy
 from pathlib import Path
 import struct
 import tkinter as tk
+from tkinter import font as tkfont
 from tkinter import ttk, filedialog, messagebox, simpledialog
 import webbrowser
 import item_project as model
 
 FIELDS = [
+ ('表示','enabled','組込み',bool,['有','無']),
  ('表示', 'name', '代表名', str, None),('表示','ja_name','日本語名',str,None),('表示','en_name','英語名',str,None),
  ('食事','stack_size','最大スタック数',int,None),('食事','nutrition','満腹度回復量',int,None),
  ('食事','saturation_modifier','隠し満腹度係数',float,None),('食事','always_edible','満腹時使用',bool,['可','不可']),
@@ -34,6 +36,12 @@ class ItemEditor:
                               ('追加',self.add),('削除',self.delete),('定義へ反映',self.apply),('テクスチャ取込',self.import_texture),
                               ('一覧を開く',self.dashboard),('公式食料の参考値',self.show_food_reference)]:
             ttk.Button(bar,text=label,command=command).pack(side='left',padx=2)
+        metadata_bar=ttk.Frame(window,padding=6);metadata_bar.pack(fill='x')
+        ttk.Label(metadata_bar,text='プロジェクトバージョン').pack(side='left')
+        self.version_value=tk.StringVar(value=self.project['version'])
+        ttk.Entry(metadata_bar,textvariable=self.version_value,width=24).pack(side='left',padx=8)
+        ttk.Label(metadata_bar,text='手動で更新するメタ情報。JARファイル名に反映します。').pack(side='left')
+        self.version_value.trace_add('write',self.edit_version)
         ttk.Label(window,text='アイテムの行を選択し、右側の各項目を直接編集して「変更を反映」。保存＝JSON保存、定義へ反映＝Java・レシピ・翻訳を生成。削除は定義へ即時反映（画像は保持）。',padding=8).pack(fill='x')
         pane=ttk.Panedwindow(window,orient='horizontal');pane.pack(fill='both',expand=True)
         self.pane=pane
@@ -43,10 +51,20 @@ class ItemEditor:
         self.columns.extend((key,label,key,kind,choices) for group,key,label,kind,choices in FIELDS)
         self.columns.extend((f'slot{i}',f'素材 {slot}',i,str,None) for i,slot in enumerate(model.SLOTS))
         self.tree=ttk.Treeview(frame,columns=tuple(c[0] for c in self.columns),show='headings',selectmode='browse')
+        self.tree.tag_configure('disabled_item',background='#e8e8e8')
+        style=ttk.Style(window)
+        heading_font=tkfont.Font(root=window,font=style.lookup('Treeview.Heading','font') or 'TkHeadingFont')
+        cell_font=tkfont.Font(root=window,font=style.lookup('Treeview','font') or 'TkDefaultFont')
         for column,label,key,kind,choices in self.columns:
             self.tree.heading(column,text=label)
-            width=230 if column in ('item_id','cooking_ingredient') or column.startswith('slot') else max(90,len(label)*13+8)
-            self.tree.column(column,width=width,minwidth=60,stretch=False)
+            values=[]
+            for item in self.project['items']:
+                if key is None:value=f'{model.NS}:{item["name"]}'
+                elif isinstance(key,int):value=item['crafting_slots'][key] if item['crafting']!='クラフト不可' else '不可'
+                else:value=self.display(item,key)
+                values.append(value)
+            width=max(heading_font.measure(label),max((cell_font.measure(value) for value in values),default=0))+8
+            self.tree.column(column,width=width,minwidth=24,stretch=False,anchor='e' if kind in (int,float) else 'w')
         ys=ttk.Scrollbar(frame,orient='vertical',command=self.tree.yview);xs=ttk.Scrollbar(frame,orient='horizontal',command=self.tree.xview)
         self.tree.configure(yscrollcommand=ys.set,xscrollcommand=xs.set)
         self.tree.grid(row=0,column=0,sticky='nsew');ys.grid(row=0,column=1,sticky='ns');xs.grid(row=1,column=0,sticky='ew')
@@ -86,7 +104,9 @@ class ItemEditor:
             row=group_rows[group];group_rows[group]+=1
             ttk.Label(groups[group],text=label).grid(row=row,column=0,sticky='w',padx=(0,8),pady=2)
             variable=tk.StringVar();self.edit_values[key]=variable
-            if choices:
+            if key=='enabled':
+                widget=ttk.Checkbutton(groups[group],variable=variable,onvalue='有',offvalue='無')
+            elif choices:
                 width=max(5,max(sum(2 if ord(character)>127 else 1 for character in value) for value in choices)+2)
                 widget=ttk.Combobox(groups[group],textvariable=variable,values=choices,state='readonly',width=width)
             else:
@@ -129,11 +149,19 @@ class ItemEditor:
 
     def display(self,item,key):
         v=item[key]
+        if key=='enabled':return '有' if v else '無'
         if isinstance(v,bool):return '可' if v else '不可'
         if v is None:return '不可'
         return str(v)
 
+    def edit_version(self,*args):
+        value=self.version_value.get()
+        if value!=self.project['version']:
+            self.project['version']=value;self.dirty=True
+            self.status.set(f'{self.path} | 未保存')
+
     def refresh(self,select=None):
+        self.version_value.set(self.project['version'])
         horizontal=self.tree.xview()[0];vertical=self.tree.yview()[0]
         self.tree.delete(*self.tree.get_children());self.cells={}
         for index,item in enumerate(self.project['items']):
@@ -144,7 +172,7 @@ class ItemEditor:
                 else:value=self.display(item,key)
                 values.append(value)
                 if key is not None:self.cells[(row,column)]=(index,key,kind,choices)
-            self.tree.insert('', 'end',iid=row,values=values)
+            self.tree.insert('', 'end',iid=row,values=values,tags=() if item['enabled'] else ('disabled_item',))
         self.tree.xview_moveto(horizontal);self.tree.yview_moveto(vertical)
         if select is not None and select<len(self.project['items']):self.tree.selection_set(f'item{select}')
         self.status.set(f'{self.path} | {len(self.project["items"])}アイテム' + (' | 未保存' if self.dirty else ''))
@@ -231,7 +259,7 @@ class ItemEditor:
             for group,key,label,kind,choices in FIELDS:
                 raw=self.edit_values[key].get().strip()
                 if choices and raw not in choices:raise ValueError(f'{label}: 選択肢から指定してください')
-                try:target[key]=(raw=='可') if kind is bool else (None if key=='campfire_ticks' and raw=='不可' else kind(raw))
+                try:target[key]=(raw==('有' if key=='enabled' else '可')) if kind is bool else (None if key=='campfire_ticks' and raw=='不可' else kind(raw))
                 except ValueError:raise ValueError(f'{label}: 入力値を確認してください') from None
             target['crafting_slots']=[self.edit_values[i].get().strip() for i in range(9)]
             model.validate(candidate)

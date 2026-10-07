@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "culinary_expansion:pork_block",
+  "result": {
+    "id": "culinary_expansion:lard_block",
+    "count": 1
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

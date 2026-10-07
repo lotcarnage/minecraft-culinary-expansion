@@ -1,0 +1,11 @@
+{
+  "category": "misc",
+  "result": {
+    "id": "culinary_expansion:lard_grain",
+    "count": 9
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "culinary_expansion:lard_block"
+  ]
+}

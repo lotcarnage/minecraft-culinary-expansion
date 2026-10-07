@@ -113,5 +113,51 @@ class ProjectTests(unittest.TestCase):
             with self.assertRaises(OSError):m.export(self.project,self.path,self.root)
         after={p:p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
         self.assertEqual(before,after)
+    def test_disabled_items_are_retained_but_not_exported(self):
+        disabled=m.default_item('inactive');disabled['enabled']=False
+        self.project['items'].append(disabled)
+        m.export(self.project,self.path,self.root)
+        saved=m.load(self.path)
+        self.assertFalse(saved['items'][1]['enabled'])
+        files=m.generated(saved,self.root)
+        self.assertNotIn(m.ASSETS+'items/inactive.json',files)
+        self.assertNotIn('ITEMS.register("inactive"',files[m.JAVA+'ModItems.java'].decode())
+        self.assertNotIn('item.culinary_expansion.inactive',json.loads(files[m.ASSETS+'lang/ja_jp.json']))
+        saved['items'][1]['enabled']=True
+        m.export(saved,self.path,self.root)
+        self.assertTrue((self.root/(m.ASSETS+'items/inactive.json')).exists())
+        saved['items'][1]['enabled']=False
+        inactive_path=self.root/(m.ASSETS+'items/inactive.json')
+        before=inactive_path.read_bytes()
+        m.export(saved,self.path,self.root)
+        self.assertEqual(inactive_path.read_bytes(),before)
+    def test_recipe_using_disabled_ingredient_is_not_exported(self):
+        ingredient=m.default_item('ingredient');ingredient['enabled']=False
+        product=self.project['items'][0]
+        product.update(smelting=False,smoking=False,crafting='不定形')
+        product['crafting_slots']=[m.NS+':ingredient']+['不要']*8
+        self.project['items'].append(ingredient)
+        files=m.generated(self.project,self.root)
+        self.assertNotIn(m.DATA+'recipe/fried_egg_from_crafting.json',files)
+        self.assertIn('ITEMS.register("fried_egg"',files[m.JAVA+'ModItems.java'].decode())
+    def test_legacy_enabled_initialization_and_explicit_value_preservation(self):
+        item=self.project['items'][0];item.pop('enabled');item['nutrition']=0
+        self.path.write_text(json.dumps(self.project),encoding='utf-8')
+        loaded=m.load(self.path)
+        self.assertFalse(loaded['items'][0]['enabled'])
+        loaded['items'][0]['enabled']=True
+        m.save(loaded,self.path)
+        self.assertTrue(m.load(self.path)['items'][0]['enabled'])
+    def test_manual_project_version_roundtrip_and_validation(self):
+        self.project['version']='1.2.3-beta.1'
+        m.save(self.project,self.path)
+        loaded=m.load(self.path)
+        self.assertEqual(loaded['version'],'1.2.3-beta.1')
+        loaded['items'][0]['nutrition']=7
+        m.save(loaded,self.path)
+        self.assertEqual(m.load(self.path)['version'],'1.2.3-beta.1')
+        for version in ('','../outside','1/2','1:2',None):
+            loaded['version']=version
+            with self.assertRaises(ValueError):m.validate(loaded)
 
 if __name__=='__main__':unittest.main()
