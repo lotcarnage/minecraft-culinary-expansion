@@ -45,6 +45,13 @@ tasks.named('processResources', ProcessResources).configure {
     inputs.file(itemProject)
     def projectItems = new groovy.json.JsonSlurper().parse(itemProject).items
     def disabledNames = projectItems.findAll { !it.enabled }.collect { it.name } as Set
+    def recipeDirectory = file('../source/main/resources/data/culinary_expansion/recipe')
+    def excludedRecipes = fileTree(recipeDirectory).matching { include '**/*.json' }.files.findAll { recipe ->
+        def text = recipe.getText('UTF-8')
+        disabledNames.any { text.contains('"culinary_expansion:' + it + '"') }
+    }.collect { recipe ->
+        'culinary_expansion:' + recipeDirectory.toPath().relativize(recipe.toPath()).toString().replace('\\', '/').replaceFirst(/\.json$/, '')
+    } as Set
     exclude { details ->
         def path = details.path
         if (path.startsWith('assets/culinary_expansion/items/') ||
@@ -55,7 +62,9 @@ tasks.named('processResources', ProcessResources).configure {
         if ((path.startsWith('data/culinary_expansion/recipe/') ||
              path.startsWith('data/culinary_expansion/advancement/recipes/food/')) && path.endsWith('.json')) {
             def text = details.file.getText('UTF-8')
-            return disabledNames.any { text.contains('"culinary_expansion:' + it + '"') }
+            return disabledNames.any { text.contains('"culinary_expansion:' + it + '"') } ||
+                (path.startsWith('data/culinary_expansion/advancement/recipes/food/') &&
+                 excludedRecipes.any { text.contains('"' + it + '"') })
         }
         return false
     }

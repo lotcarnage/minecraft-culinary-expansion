@@ -45,6 +45,10 @@ def validate_mod_archive(artifact):
     project_path = ROOT / 'source/items_project.json'
     disabled = {item['name'] for item in json.loads(project_path.read_text(encoding='utf-8-sig'))['items']
                 if not item.get('enabled', item['nutrition'] > 0)} if project_path.exists() else set()
+    recipe_root = resources_root / 'data/culinary_expansion/recipe'
+    excluded_recipes = {'culinary_expansion:' + path.relative_to(recipe_root).with_suffix('').as_posix()
+                        for path in recipe_root.rglob('*.json')
+                        if any('"culinary_expansion:' + name + '"' in path.read_text(encoding='utf-8') for name in disabled)}
     def included(path):
         relative = path.relative_to(resources_root).as_posix()
         if relative.startswith(('assets/culinary_expansion/items/', 'assets/culinary_expansion/models/item/',
@@ -52,7 +56,9 @@ def validate_mod_archive(artifact):
             return path.stem not in disabled
         if relative.startswith(('data/culinary_expansion/recipe/', 'data/culinary_expansion/advancement/recipes/food/')) and path.suffix == '.json':
             text = path.read_text(encoding='utf-8')
-            return not any('"culinary_expansion:' + name + '"' in text for name in disabled)
+            return not (any('"culinary_expansion:' + name + '"' in text for name in disabled) or
+                        (relative.startswith('data/culinary_expansion/advancement/recipes/food/') and
+                         any('"' + recipe + '"' in text for recipe in excluded_recipes)))
         return True
     resource_files = [path for path in resources_root.rglob('*') if path.is_file() and included(path)]
     required = {'META-INF/mods.toml', 'dev/lotcarnage/culinaryexpansion/CulinaryExpansion.class'}
@@ -83,11 +89,29 @@ def validate_mod_archive(artifact):
             for name in archive.namelist():
                 if name.startswith('data/culinary_expansion/recipe/') and name.endswith('.json'):
                     validate_recipe_category(json.loads(archive.read(name)), name)
+            validate_recipe_references(archive)
             entry = archive.read('dev/lotcarnage/culinaryexpansion/CulinaryExpansion.class')
             if not entry.startswith(b'\xca\xfe\xba\xbe') or b'Lnet/minecraftforge/fml/common/Mod;' not in entry or b'culinary_expansion' not in entry:
                 raise ValueError('Mod entry class is missing its Forge @Mod declaration')
     except zipfile.BadZipFile as error:
         raise ValueError('Invalid mod JAR') from error
+
+
+def validate_recipe_references(archive):
+    """Advancements must not bind a mod recipe that is absent from the archive."""
+    names=set(archive.namelist())
+    for name in names:
+        if not name.startswith('data/culinary_expansion/advancement/') or not name.endswith('.json'):continue
+        advancement=json.loads(archive.read(name))
+        references=list(advancement.get('rewards',{}).get('recipes',[]))
+        for criterion in advancement.get('criteria',{}).values():
+            if criterion.get('trigger')=='minecraft:recipe_unlocked':
+                value=criterion.get('conditions',{}).get('recipes',[])
+                references.extend([value] if isinstance(value,str) else value)
+        for reference in references:
+            if reference.startswith('culinary_expansion:'):
+                path='data/culinary_expansion/recipe/'+reference.split(':',1)[1]+'.json'
+                if path not in names:raise ValueError(f'Missing recipe {reference} referenced by {name}')
 
 
 def prepare_pages():

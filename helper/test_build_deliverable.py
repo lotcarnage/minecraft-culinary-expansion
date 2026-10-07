@@ -1,5 +1,6 @@
 """Regression checks for Minecraft recipe category validation."""
 import unittest
+import json
 from pathlib import Path
 import tempfile
 from unittest.mock import patch
@@ -10,6 +11,23 @@ from build_deliverable import validate_recipe_category
 
 
 class RecipeCategoryTests(unittest.TestCase):
+    def test_missing_recipe_references_are_rejected(self):
+        for advancement in (
+            {'rewards':{'recipes':['culinary_expansion:disabled_from_crafting']}},
+            {'criteria':{'unlock':{'trigger':'minecraft:recipe_unlocked',
+                                  'conditions':{'recipes':'culinary_expansion:disabled_from_crafting'}}}},
+        ):
+            with tempfile.TemporaryDirectory() as temp:
+                artifact=Path(temp)/'test.jar'
+                with zipfile.ZipFile(artifact,'w') as archive:
+                    archive.writestr('data/culinary_expansion/advancement/test.json',json.dumps(advancement))
+                with zipfile.ZipFile(artifact) as archive:
+                    with self.assertRaisesRegex(ValueError,'Missing recipe culinary_expansion:disabled_from_crafting'):
+                        release.validate_recipe_references(archive)
+                with zipfile.ZipFile(artifact,'a') as archive:
+                    archive.writestr('data/culinary_expansion/recipe/disabled_from_crafting.json','{}')
+                with zipfile.ZipFile(artifact) as archive:release.validate_recipe_references(archive)
+
     def test_crafting_food_category_is_rejected(self):
         for kind in ('crafting_shaped','crafting_shapeless'):
             with self.assertRaisesRegex(ValueError,'Invalid recipe category'):
