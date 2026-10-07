@@ -152,22 +152,21 @@ def publish(root, config, artifacts):
         name = html.escape(artifact.name)
         label = 'プラグインJAR' if artifact.suffix == '.jar' else 'リソースパックZIP'
         links.append(f'<div class="artifact">\n'
-                     f'  <a class="button" href="downloads/{name}" download>{label}をダウンロード</a>\n'
+                     f'  <a class="button" href="downloads/{name}" download>{label}をダウンロード（v{html.escape(config["mod_version"])}）</a>\n'
                      f'  <p class="small">{name} · {artifact.stat().st_size / 1024:.1f} KB</p>\n'
-                     '  <details>\n    <summary>ファイルのチェックサム（SHA-256）</summary>\n'
+                     '  <details>\n    <summary>ハッシュ値（SHA-256）</summary>\n'
                      f'    <code class="hash">{digest}</code>\n'
-                     f'    <p><a href="downloads/{name}.sha256" download>チェックサムファイルをダウンロード</a></p>\n'
+                     f'    <p><a href="downloads/{name}.sha256" download>ハッシュ値ファイルをダウンロード</a></p>\n'
                      '  </details>\n</div>')
     content = ('<section class="card" id="paper" aria-labelledby="paper-title">\n'
-               '  <h2 id="paper-title">PaperMC版をダウンロード</h2>\n'
+               '  <h3 id="paper-title" style="margin-top:0">PaperMC版</h3>\n'
                '  <div class="badges">\n'
                f'    <span class="badge">Minecraft {html.escape(config["minecraft_version"])}</span>\n'
                '    <span class="badge">PaperMC</span>\n'
-               f'    <span class="badge">v{html.escape(config["mod_version"])}</span>\n'
-               '  </div>\n'
-               '  <p class="small">サーバーにプラグインを導入します。クライアントへのMOD導入は不要です。</p>\n' +
+               '  </div>\n' +
                '\n'.join(links) + '\n'
-               '  <h3>導入方法</h3>\n'
+               '  <details class="install-guide" style="margin-top:24px">\n'
+               '  <summary>導入方法</summary>\n'
                '  <ol>\n'
                f'    <li>Java 25を使用するPaperMC {html.escape(config["minecraft_version"])}サーバーを用意します。</li>\n'
                '    <li>JARをサーバーの<code>plugins</code>に入れて再起動します。</li>\n'
@@ -175,7 +174,8 @@ def publish(root, config, artifacts):
                '  </ol>\n'
                '  <p class="small">リソースパックはserver.propertiesのresource-pack URLでも配布できます。'
                '管理者は<code>/culinary アイテムID</code>で料理を取得できます。'
-               'Forge版とはアイテムの保存形式が異なります。</p>\n</section>')
+               'Forge版とはアイテムの保存形式が異なります。</p>\n'
+               '  </details>\n</section>')
     page = root / 'deliverables/index.html'
     section = '<!-- PAPER START -->\n' + content + '\n<!-- PAPER END -->'
     if page.exists():
