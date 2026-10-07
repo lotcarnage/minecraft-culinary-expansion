@@ -119,6 +119,8 @@ def prepare_pages():
     name = f"culinary-expansion-{config['minecraft_version']}-{config['mod_version']}.jar"
     artifact = ROOT / 'intermediate/gradle-output/libs' / name
     validate_mod_archive(artifact)
+    import generate_food_guide
+    guide = generate_food_guide.render(config, ROOT)
     digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
     checksum = f'{digest}  {name}\n'
     template = (ROOT / 'build/download-page.template.html').read_text(encoding='utf-8-sig')
@@ -143,6 +145,7 @@ def prepare_pages():
                     assets / 'fried_egg.png')
     (downloads / (name + '.sha256')).write_text(checksum, encoding='utf-8')
     (ROOT / 'deliverables/index.html').write_text(template, encoding='utf-8')
+    (ROOT / 'deliverables/foods.html').write_text(guide, encoding='utf-8')
     (ROOT / '.nojekyll').write_text('', encoding='utf-8')
     print(f'Distribution JAR: {downloads / name}')
     print(f'GitHub Pages files: {ROOT / "deliverables"}')

@@ -376,8 +376,8 @@
       "effect_level": 1,
       "effect_probability": 1.0,
       "remainder": "なし",
-      "smelting": true,
-      "smoking": true,
+      "smelting": false,
+      "smoking": false,
       "cooking_ticks": 200,
       "experience": 0.35,
       "cooking_ingredient": "minecraft:egg",
@@ -412,8 +412,8 @@
       "effect_level": 1,
       "effect_probability": 1.0,
       "remainder": "なし",
-      "smelting": true,
-      "smoking": true,
+      "smelting": false,
+      "smoking": false,
       "cooking_ticks": 200,
       "experience": 0.35,
       "cooking_ingredient": "minecraft:egg",
@@ -902,11 +902,7 @@
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/sweet_berry_juice_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/sweet_berry_milk_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/thick_sliced_bread_from_crafting.json",
-    "source/main/resources/data/culinary_expansion/advancement/recipes/food/thick_sliced_bread_from_smelting.json",
-    "source/main/resources/data/culinary_expansion/advancement/recipes/food/thick_sliced_bread_from_smoking.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/thin_sliced_bread_from_crafting.json",
-    "source/main/resources/data/culinary_expansion/advancement/recipes/food/thin_sliced_bread_from_smelting.json",
-    "source/main/resources/data/culinary_expansion/advancement/recipes/food/thin_sliced_bread_from_smoking.json",
     "source/main/resources/data/culinary_expansion/recipe/bacon_from_smoking.json",
     "source/main/resources/data/culinary_expansion/recipe/chocolate_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/french_fries_from_crafting.json",
@@ -928,11 +924,7 @@
     "source/main/resources/data/culinary_expansion/recipe/sweet_berry_juice_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/sweet_berry_milk_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/thick_sliced_bread_from_crafting.json",
-    "source/main/resources/data/culinary_expansion/recipe/thick_sliced_bread_from_smelting.json",
-    "source/main/resources/data/culinary_expansion/recipe/thick_sliced_bread_from_smoking.json",
-    "source/main/resources/data/culinary_expansion/recipe/thin_sliced_bread_from_crafting.json",
-    "source/main/resources/data/culinary_expansion/recipe/thin_sliced_bread_from_smelting.json",
-    "source/main/resources/data/culinary_expansion/recipe/thin_sliced_bread_from_smoking.json"
+    "source/main/resources/data/culinary_expansion/recipe/thin_sliced_bread_from_crafting.json"
   ],
   "planned_mechanics": {
     "status": "仕様のみ。標準ジェネレーターはこの項目を実装しません。",
@@ -983,5 +975,5 @@
     "vanilla_recipes": "既存レシピを置換せず、専用アイテムと材料の組み合わせで追加します。",
     "provisional_properties": "追加アイテムの食料値は未決定のため0に仮設定しています。ブロック名のアイテムの設置可否は未決定です。"
   },
-  "version": "0.1.3"
+  "version": "0.1.4"
 }

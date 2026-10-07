@@ -6,7 +6,9 @@ Minecraft Java Edition向けに、料理系のアイテムとレシピを拡張�
 
 **[ダウンロードページを開く](https://lotcarnage.github.io/minecraft-culinary-expansion/deliverables/)**
 
-配布JAR、対応バージョン、チェックサム、導入手順はダウンロードページを参照してください。ページの生成元は `build/download-page.template.html`、公開ファイルは `deliverables/index.html` です。
+配布JAR、対応バージョン、チェックサム、導入手順はダウンロードページを参照してください。料理の効果・回復量・材料・クラフト配置は [料理図鑑](deliverables/foods.html) で検索・比較できます。
+
+ページの生成元は `build/download-page.template.html`、公開ファイルは `deliverables/index.html` です。
 
 ## リポジトリ構成
 
@@ -46,7 +48,7 @@ python -m unittest discover -s helper -p "test_*.py"
 
 Windows・Linux・macOSで同じPythonスクリプトを使用できます。環境に応じて `python` を `python3` または `py -3` に読み替えてください。LinuxでTkinterがない場合はOSのパッケージ管理から追加してください。
 
-アイテム編集の保存先は `source/items_project.json` です。ビルドスクリプトは保存済みJSONからJava・リソース・管理一覧を生成し、GradleでビルドしてJARを検査します。検査に成功した配布物を `deliverables/` に配置します。使用するJDKは `JAVA_HOME` または `--java-home` で指定できます。
+アイテム編集の保存先は `source/items_project.json` です。ビルドスクリプトは保存済みJSONからJava・リソース・管理一覧を生成し、GradleでビルドしてJARを検査します。検査に成功した配布物を `deliverables/` に配置します。利用者向けの料理図鑑 `deliverables/foods.html` も生成します。生成元は `build/food-guide.template.html` と `helper/generate_food_guide.py` です。掲載対象・効果・レシピは `source/items_project.json` の組込み有無と属性から取得し、無効な料理と、その料理を材料に使うレシピは除外します。画像を埋め込むためオフラインでも閲覧できます。使用するJDKは `JAVA_HOME` または `--java-home` で指定できます。
 
 配布物生成の順序は「JSONから生成 → Gradleビルド → JAR検査 → `deliverables/downloads/`とチェックサム・配布ページを更新」です。このスクリプトの操作はリポジトリ内に閉じ、Minecraftのゲームフォルダへのインストールは行いません。完了メッセージと終了コード0を確認してください。失敗時は以後の工程を実行せず、古い配布物が残っていても今回の生成結果として扱いません。
 

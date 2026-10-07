@@ -12,16 +12,6 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:egg"
-          }
-        ]
-      }
-    },
-    "has_material_1": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
             "items": "culinary_expansion:loaf_bread"
           }
         ]
@@ -31,8 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_material_0",
-      "has_material_1"
+      "has_material_0"
     ]
   ],
   "rewards": {
