@@ -8,6 +8,7 @@ from tkinter import font as tkfont
 from tkinter import ttk, filedialog, messagebox, simpledialog
 import webbrowser
 import item_project as model
+from horizontal_tree import HorizontalTreeViewport
 
 FIELDS = [
  ('表示','enabled','組込み',bool,['有','無']),
@@ -50,7 +51,9 @@ class ItemEditor:
         self.columns=[('item_id','アイテムID',None,None,None)]
         self.columns.extend((key,label,key,kind,choices) for group,key,label,kind,choices in FIELDS)
         self.columns.extend((f'slot{i}',f'素材 {slot}',i,str,None) for i,slot in enumerate(model.SLOTS))
-        self.tree=ttk.Treeview(frame,columns=tuple(c[0] for c in self.columns),show='headings',selectmode='browse')
+        column_ids=tuple(c[0] for c in self.columns)
+        self.tree=ttk.Treeview(frame,columns=column_ids+(HorizontalTreeViewport.LEFT,HorizontalTreeViewport.RIGHT),
+                               displaycolumns=column_ids,show='headings',selectmode='browse')
         self.tree.tag_configure('disabled_item',background='#e8e8e8')
         style=ttk.Style(window)
         heading_font=tkfont.Font(root=window,font=style.lookup('Treeview.Heading','font') or 'TkHeadingFont')
@@ -66,7 +69,8 @@ class ItemEditor:
             width=max(heading_font.measure(label),max((cell_font.measure(value) for value in values),default=0))+8
             self.tree.column(column,width=width,minwidth=24,stretch=False,anchor='e' if kind in (int,float) else 'w')
         ys=ttk.Scrollbar(frame,orient='vertical',command=self.tree.yview);xs=ttk.Scrollbar(frame,orient='horizontal',command=self.tree.xview)
-        self.tree.configure(yscrollcommand=ys.set,xscrollcommand=xs.set)
+        self.tree.configure(yscrollcommand=ys.set)
+        self.horizontal_viewport=HorizontalTreeViewport(self.tree,column_ids,xs)
         self.tree.grid(row=0,column=0,sticky='nsew');ys.grid(row=0,column=1,sticky='ns');xs.grid(row=1,column=0,sticky='ew')
         frame.rowconfigure(0,weight=1);frame.columnconfigure(0,weight=1)
         sidebar=ttk.Frame(pane);pane.add(sidebar,weight=0)

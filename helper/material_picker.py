@@ -1,5 +1,6 @@
 """Local Minecraft material catalog and a standard Tkinter selection dialog."""
 import json
+from contextlib import ExitStack
 import os
 from pathlib import Path
 import tkinter as tk
@@ -52,35 +53,38 @@ class MaterialCatalog:
                     name=Path(path).stem
                     self.entries[f'minecraft:{name}']=self.translations.get(f'item.minecraft.{name}',self.translations.get(f'block.minecraft.{name}',name))
         for item in items:self.entries[f'culinary_expansion:{item["name"]}']=item['ja_name']
+        self.search_entries=[(key,key.casefold(),label.casefold()) for key,label in self.entries.items()]
 
-    def texture(self,item_id):
+    def texture(self,item_id,archive=None):
         namespace,name=item_id.split(':',1) if ':' in item_id else ('','')
         if namespace=='culinary_expansion':
             path=self.root/f'source/main/resources/assets/{namespace}/textures/item/{name}.png'
             return path.read_bytes() if path.is_file() else None
         if namespace!='minecraft' or not self.jar:return None
+        if archive is None:
+            with zipfile.ZipFile(self.jar) as opened:
+                return self.texture(item_id,opened)
         # Display ordinary 2D item textures. Complex/3D models remain selectable by name.
-        with zipfile.ZipFile(self.jar) as archive:
-            definition=json.loads(archive.read(f'assets/minecraft/items/{name}.json'))
-            model=definition.get('model',{})
-            if model.get('type')!='minecraft:model':return None
-            reference=model.get('model','')
-            textures={};seen=set()
-            for _ in range(16):
-                if reference in seen:break
-                seen.add(reference)
-                parts=reference.split(':',1)
-                if len(parts)!=2:break
-                path=f'assets/{parts[0]}/models/{parts[1]}.json'
-                if path not in self.names:break
-                data=json.loads(archive.read(path))
-                for key,value in data.get('textures',{}).items():textures.setdefault(key,value)
-                reference=data.get('parent','')
-            texture=textures.get('layer0','')
-            parts=texture.split(':',1)
-            if len(parts)!=2:return None
-            path=f'assets/{parts[0]}/textures/{parts[1]}.png'
-            return archive.read(path) if path in self.names else None
+        definition=json.loads(archive.read(f'assets/minecraft/items/{name}.json'))
+        model=definition.get('model',{})
+        if model.get('type')!='minecraft:model':return None
+        reference=model.get('model','')
+        textures={};seen=set()
+        for _ in range(16):
+            if reference in seen:break
+            seen.add(reference)
+            parts=reference.split(':',1)
+            if len(parts)!=2:break
+            path=f'assets/{parts[0]}/models/{parts[1]}.json'
+            if path not in self.names:break
+            data=json.loads(archive.read(path))
+            for key,value in data.get('textures',{}).items():textures.setdefault(key,value)
+            reference=data.get('parent','')
+        texture=textures.get('layer0','')
+        parts=texture.split(':',1)
+        if len(parts)!=2:return None
+        path=f'assets/{parts[0]}/textures/{parts[1]}.png'
+        return archive.read(path) if path in self.names else None
 
 
 class MaterialPicker:
@@ -114,9 +118,11 @@ class MaterialPicker:
         ttk.Button(bottom,text='閉じる',command=self.window.destroy).pack(side='right',padx=4)
         self.list.bind('<Double-1>',self.select);self.list.bind('<Return>',self.select)
         self.search.trace_add('write',self.filter)
+        if current in self.catalog.entries:
+            self.page=list(self.catalog.entries).index(current)//self.PAGE_SIZE
         self.populate()
         if current in self.matches:
-            self.page=self.matches.index(current)//self.PAGE_SIZE;self.populate();self.list.selection_set(current);self.list.see(current)
+            self.list.selection_set(current);self.list.see(current)
         self.window.grab_set()
 
     def choose_jar(self):
@@ -135,13 +141,27 @@ class MaterialPicker:
 
     def populate(self):
         query=self.search.get().strip().casefold()
-        self.matches=[key for key,label in self.catalog.entries.items() if query in key.casefold() or query in label.casefold()]
+        self.matches=[key for key,search_id,search_label in self.catalog.search_entries if query in search_id or query in search_label]
         self.list.delete(*self.list.get_children())
-        for key in self.matches[self.page*self.PAGE_SIZE:(self.page+1)*self.PAGE_SIZE]:
+        keys=self.matches[self.page*self.PAGE_SIZE:(self.page+1)*self.PAGE_SIZE]
+        # Keep one archive open for this page, and close it even if loading fails.
+        with ExitStack() as stack:
+            archive=None;archive_error=False
+            if self.catalog.jar and any(key.startswith('minecraft:') and key not in self.images for key in keys):
+                try:archive=stack.enter_context(zipfile.ZipFile(self.catalog.jar))
+                except (OSError,ValueError,zipfile.BadZipFile):archive_error=True
+            self.populate_rows(keys,archive,archive_error)
+        self.previous.configure(state='normal' if self.page else 'disabled')
+        self.next.configure(state='normal' if (self.page+1)*self.PAGE_SIZE<len(self.matches) else 'disabled')
+        self.page_info.configure(text=f'{len(self.matches)}件 / {self.page+1}ページ')
+        self.notice.configure(text='ローカルの公式リソースを使用。日本語はインストール済みMinecraftの言語データから読み込みます。立体・複合モデルは画像なしで表示します。' if self.catalog.jar else '公式リソースがありません。ビルド後に開くか、Minecraft JARを指定してください。自作アイテムと「不要」は選択できます。')
+
+    def populate_rows(self,keys,archive,archive_error=False):
+        for key in keys:
             if key not in self.images:
                 image=None
                 try:
-                    data=self.catalog.texture(key)
+                    data=None if archive_error and key.startswith('minecraft:') else self.catalog.texture(key,archive)
                     if data:
                         image=tk.PhotoImage(master=self.window,data=data)
                         largest=max(image.width(),image.height())
@@ -150,10 +170,6 @@ class MaterialPicker:
                 self.images[key]=image
             image=self.images[key]
             self.list.insert('','end',iid=key,text='' if image else '画像なし',image=image or '',values=(self.catalog.entries[key],key))
-        self.previous.configure(state='normal' if self.page else 'disabled')
-        self.next.configure(state='normal' if (self.page+1)*self.PAGE_SIZE<len(self.matches) else 'disabled')
-        self.page_info.configure(text=f'{len(self.matches)}件 / {self.page+1}ページ')
-        self.notice.configure(text='ローカルの公式リソースを使用。日本語はインストール済みMinecraftの言語データから読み込みます。立体・複合モデルは画像なしで表示します。' if self.catalog.jar else '公式リソースがありません。ビルド後に開くか、Minecraft JARを指定してください。自作アイテムと「不要」は選択できます。')
 
     def select(self,event=None):
         selected=self.list.selection()
