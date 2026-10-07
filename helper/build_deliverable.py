@@ -134,6 +134,12 @@ def prepare_pages():
     }
     for key, value in tokens.items():
         template = template.replace('{{' + key + '}}', html.escape(value, quote=True))
+    existing_page = ROOT / 'deliverables/index.html'
+    if existing_page.exists():
+        paper_section = re.search(r'<!-- PAPER START -->.*?<!-- PAPER END -->',
+                                  existing_page.read_text(encoding='utf-8'), re.S)
+        if paper_section:
+            template = template.replace('<!-- PAPER SLOT -->', paper_section.group())
     if re.search(r'\{\{[A-Z_]+\}\}', template):
         raise ValueError('Unresolved page template token.')
     downloads = ROOT / 'deliverables/downloads'
@@ -151,7 +157,7 @@ def prepare_pages():
     print(f'GitHub Pages files: {ROOT / "deliverables"}')
 
 
-def build(java_home):
+def build(java_home, platform='forge'):
     env = os.environ.copy()
     # Reuse a project-local portable JDK when the Windows PATH still points to Java 8.
     if not java_home and not env.get('JAVA_HOME'):
@@ -185,21 +191,40 @@ def build(java_home):
         generate_item_dashboard.generate(ROOT / 'document/item_dashboard.html')
     command = ([str(ROOT / 'build/gradlew.bat')] if os.name == 'nt'
                else ['sh', str(ROOT / 'build/gradlew')])
-    subprocess.run(command + ['--no-daemon', '--project-dir', str(ROOT / 'build'),
+    if platform in ('forge', 'all'):
+        subprocess.run(command + ['--no-daemon', '--project-dir', str(ROOT / 'build'),
                               '--project-cache-dir', str(ROOT / 'intermediate/gradle-cache'),
                               'clean', 'build'], cwd=ROOT, env=env, check=True)
+    if platform in ('paper', 'all'):
+        import paper_release
+        paper_release.generate(ROOT, properties())
+        subprocess.run(command + ['--no-daemon', '--project-dir', str(ROOT / 'build/paper'),
+                                  '--project-cache-dir', str(ROOT / 'intermediate/paper-gradle-cache'),
+                                  'clean', 'build'], cwd=ROOT, env=env, check=True)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--java-home', help='JDK 25 directory (defaults to JAVA_HOME or PATH)')
     parser.add_argument('--pages-only', action='store_true', help='Prepare the page from an existing intermediate/gradle-output/libs JAR')
+    parser.add_argument('--platform', choices=('forge', 'paper', 'all'), default='forge',
+                        help='Build/release Forge, Paper, or both (default: forge)')
     args = parser.parse_args()
     try:
         if not args.pages_only:
             print('Generating resources and building the mod...', flush=True)
-            build(args.java_home)
-        prepare_pages()
+            if args.platform == 'forge':
+                build(args.java_home)
+            else:
+                build(args.java_home, args.platform)
+        paper_artifacts = None
+        if args.platform in ('paper', 'all'):
+            import paper_release
+            paper_artifacts = paper_release.prepare(ROOT, properties())
+        if args.platform in ('forge', 'all'):
+            prepare_pages()
+        if paper_artifacts:
+            paper_release.publish(ROOT, properties(), paper_artifacts)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         print(f'Build failed: {error}', file=sys.stderr)
         print('Release generation stopped. Existing deliverables may be older; do not use them as this build output.', file=sys.stderr)

@@ -1,0 +1,19 @@
+plugins { id 'java' }
+layout.buildDirectory = layout.projectDirectory.dir('../../intermediate/paper-output')
+def config = new Properties()
+file('../gradle.properties').withInputStream { config.load(it) }
+version = new groovy.json.JsonSlurper().parse(file('../../source/items_project.json')).version
+group = 'dev.lotcarnage.culinaryexpansion'
+base { archivesName = "culinary-expansion-paper-${config.minecraft_version}" }
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+}
+dependencies { compileOnly "io.papermc.paper:paper-api:${config.paper_api_version}" }
+sourceSets.main {
+    java.setSrcDirs(['../../source/paper/java', '../../intermediate/paper-generated/java'])
+    resources.setSrcDirs(['../../intermediate/paper-generated/resources'])
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.named('jar') { from('../../LICENSE') }

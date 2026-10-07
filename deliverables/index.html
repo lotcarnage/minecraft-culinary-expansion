@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Minecraft Java Editionに料理系のアイテムとレシピを追加するCulinary Expansion。Forge版の配布JARと導入手順。">
+  <meta name="description" content="Minecraft Java Editionに料理系のアイテムとレシピを追加するCulinary Expansion。Forge版・PaperMC版の配布物と導入手順。">
   <title>Culinary Expansion — ダウンロード</title>
   <style>
     :root { color-scheme: dark; --bg:#121b16; --panel:#1d2b22; --text:#f3f4e9; --muted:#c0cbbf; --accent:#ffcf61; }
@@ -18,6 +18,12 @@
     .hero { display:flex; align-items:center; justify-content:space-between; gap:28px; }
     .egg { width:112px; height:112px; image-rendering:pixelated; flex-shrink:0; }
     .card { background:var(--panel); border:1px solid #3a4d3d; border-radius:16px; padding:28px; margin-top:28px; }
+    .download-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; margin-top:28px; align-items:start; }
+    .download-grid > .card { margin-top:0; min-width:0; }
+    h3 { font-size:1.05rem; margin:24px 0 12px; }
+    .artifact + .artifact { margin-top:24px; padding-top:20px; border-top:1px solid #3a4d3d; }
+    .button { overflow-wrap:anywhere; }
+    @media(max-width:760px) { .download-grid { grid-template-columns:1fr; } }
     .badges { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 22px; }
     .badge { border:1px solid #526354; border-radius:6px; padding:3px 10px; font-size:.9rem; }
     a { color:var(--accent); text-underline-offset:4px; }
@@ -37,43 +43,77 @@
 <main>
   <header class="hero">
     <div>
-      <div class="eyebrow">MINECRAFT JAVA EDITION MOD</div>
+      <div class="eyebrow">MINECRAFT JAVA EDITION · FORGE / PAPERMC</div>
       <h1>Culinary<br>Expansion</h1>
-      <p class="lead">Minecraftの食卓に、もっと料理を。<br>料理系のアイテムとレシピを追加するMODです。</p>
-      <p><a class="button" href="foods.html">料理図鑑でMODの内容を見る →</a></p>
+      <p class="lead">Minecraftの食卓に、もっと料理を。<br>料理系のアイテムとレシピを追加するForge MOD・PaperMCプラグインです。</p>
+      <p><a class="button" href="foods.html">料理図鑑・レシピ一覧を見る →</a></p>
     </div>
     <img class="egg" src="assets/fried_egg.png" width="112" height="112" alt="目玉焼きのピクセルアート">
   </header>
-  <section class="card" aria-labelledby="download-title">
-    <h2 id="download-title">Forge版をダウンロード</h2>
-    <div class="badges">
-      <span class="badge">Minecraft 26.3</span>
-      <span class="badge">Forge 66.0.5</span>
-      <span class="badge">MOD v0.1.4</span>
-    </div>
-    <a class="button" href="downloads/culinary-expansion-26.3-0.1.4.jar" download>配布用JARをダウンロード</a>
-    <p class="small">culinary-expansion-26.3-0.1.4.jar · 30.3 KB<br>Minecraft Java Edition専用です。クライアントとサーバーの両方に対応しています。</p>
-    <details>
-      <summary>ファイルのチェックサム（SHA-256）</summary>
-      <code class="hash">6c1d7b0bdd74cc6df0177b22d90cd52915c6c858e4b9d2239fa35c838dea46c3</code>
-      <p><a href="downloads/culinary-expansion-26.3-0.1.4.jar.sha256" download>チェックサムファイルをダウンロード</a></p>
-    </details>
-  </section>
-    <section class="card" aria-labelledby="guide-title">
-      <h2 id="guide-title">料理図鑑・MODの内容紹介</h2>
-      <p>このMODに含まれる料理を画像付きで紹介しています。効果・回復量・材料・クラフト配置を検索・比較できます。</p>
-      <a class="button" href="foods.html">料理図鑑・レシピ一覧を見る →</a>
-    </section>
-    <section class="card" aria-labelledby="install-title">
-      <h2 id="install-title">導入方法</h2>
+  <div class="download-grid">
+    <section class="card" id="forge" aria-labelledby="forge-title">
+      <h2 id="forge-title">Forge版をダウンロード</h2>
+      <div class="badges">
+        <span class="badge">Minecraft 26.3</span>
+        <span class="badge">Forge 66.0.5</span>
+        <span class="badge">v0.1.4</span>
+      </div>
+      <p class="small">クライアントとサーバーの両方にMODを導入します。</p>
+      <div class="artifact">
+        <a class="button" href="downloads/culinary-expansion-26.3-0.1.4.jar" download>MOD JARをダウンロード</a>
+        <p class="small">culinary-expansion-26.3-0.1.4.jar · 30.3 KB</p>
+        <details>
+          <summary>ファイルのチェックサム（SHA-256）</summary>
+          <code class="hash">6c1d7b0bdd74cc6df0177b22d90cd52915c6c858e4b9d2239fa35c838dea46c3</code>
+          <p><a href="downloads/culinary-expansion-26.3-0.1.4.jar.sha256" download>チェックサムファイルをダウンロード</a></p>
+        </details>
+      </div>
+      <h3>導入方法</h3>
       <ol>
         <li>Java 25を使用するMinecraft 26.3環境を用意します。</li>
         <li><a href="https://files.minecraftforge.net/net/minecraftforge/forge/index_26.3.html">Forge 66.0.5</a>をインストールします。</li>
-        <li>ダウンロードしたJARをゲームフォルダーの<code>mods</code>に入れます。</li>
+        <li>JARをゲームフォルダーの<code>mods</code>に入れます。</li>
         <li>Forgeのプロファイルでゲームを起動します。</li>
       </ol>
       <p class="small">マルチプレイでは、参加者とサーバーに同じバージョンのMODを導入してください。</p>
     </section>
+    <!-- PAPER START -->
+<section class="card" id="paper" aria-labelledby="paper-title">
+  <h2 id="paper-title">PaperMC版をダウンロード</h2>
+  <div class="badges">
+    <span class="badge">Minecraft 26.3</span>
+    <span class="badge">PaperMC</span>
+    <span class="badge">v0.1.4</span>
+  </div>
+  <p class="small">サーバーにプラグインを導入します。クライアントへのMOD導入は不要です。</p>
+<div class="artifact">
+  <a class="button" href="downloads/culinary-expansion-paper-26.3-0.1.4.jar" download>プラグインJARをダウンロード</a>
+  <p class="small">culinary-expansion-paper-26.3-0.1.4.jar · 8.6 KB</p>
+  <details>
+    <summary>ファイルのチェックサム（SHA-256）</summary>
+    <code class="hash">266a38b610b5978ffd3957bf2bc872d5a77797b5a31a7c139429fc24b7b2c128</code>
+    <p><a href="downloads/culinary-expansion-paper-26.3-0.1.4.jar.sha256" download>チェックサムファイルをダウンロード</a></p>
+  </details>
+</div>
+<div class="artifact">
+  <a class="button" href="downloads/culinary-expansion-paper-resources-26.3-0.1.4.zip" download>リソースパックZIPをダウンロード</a>
+  <p class="small">culinary-expansion-paper-resources-26.3-0.1.4.zip · 12.3 KB</p>
+  <details>
+    <summary>ファイルのチェックサム（SHA-256）</summary>
+    <code class="hash">c7ddc576d1e838158bbe0058f1ab592c71b1877695810d1a9b047be6d9f8a303</code>
+    <p><a href="downloads/culinary-expansion-paper-resources-26.3-0.1.4.zip.sha256" download>チェックサムファイルをダウンロード</a></p>
+  </details>
+</div>
+  <h3>導入方法</h3>
+  <ol>
+    <li>Java 25を使用するPaperMC 26.3サーバーを用意します。</li>
+    <li>JARをサーバーの<code>plugins</code>に入れて再起動します。</li>
+    <li>リソースパックZIPを参加者の<code>resourcepacks</code>に入れて有効にします。</li>
+  </ol>
+  <p class="small">リソースパックはserver.propertiesのresource-pack URLでも配布できます。管理者は<code>/culinary アイテムID</code>で料理を取得できます。Forge版とはアイテムの保存形式が異なります。</p>
+</section>
+<!-- PAPER END -->
+  </div>
   <footer>
     <a href="https://github.com/lotcarnage/minecraft-culinary-expansion">ソースコード・開発手順</a>
     <p>MIT License · lotcarnage<br>Minecraftの公式製品ではありません。MojangまたはMicrosoftの承認・提携を受けていません。</p>

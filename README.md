@@ -1,6 +1,6 @@
 # Culinary Expansion
 
-Minecraft Java Edition向けに、料理系のアイテムとレシピを拡張するForge MODの開発リポジトリです。MODのソース、アイテム定義を編集する開発ツール、ビルド構成、配布ページを管理します。
+Minecraft Java Edition向けに、料理系のアイテムとレシピを拡張するForge MODとPaperMCプラグインの開発リポジトリです。共通のアイテム定義から両方の配布物を生成します。
 
 ## ダウンロード
 
@@ -36,6 +36,12 @@ python helper/item_editor.py
 # 保存済みJSONから定義を生成し、配布JARと公開ページを更新
 python helper/build_deliverable.py
 
+# Forge版とPaperMC版を両方ビルドして配布物を更新
+python helper/build_deliverable.py --platform all
+
+# PaperMC版のみビルド（Forge環境の取得は不要）
+python helper/build_deliverable.py --platform paper
+
 # JDKの場所を指定する場合
 python helper/build_deliverable.py --java-home "JDKのディレクトリ"
 
@@ -70,6 +76,23 @@ WindowsのPATHがJava 8を指している場合も、`intermediate/jdk25/`以下
 GitHubの **Settings → Pages** で **Deploy from a branch**、**main / /(root)** を指定します。公開処理が完了すると、READMEのダウンロードリンクから `deliverables/index.html` にアクセスできます。
 
 既存のビルド済みJARから公開ページだけを更新する場合は、`python helper/build_deliverable.py --pages-only` を実行してください。
+
+## PaperMC版
+
+`--platform`は`forge`（既定）、`paper`、`all`を指定できます。`all`では両方のビルドと成果物の検査に成功した後に配布物を更新します。`--pages-only --platform all`で両方の既存成果物からページを再生成できます。片方だけ更新した場合も、公開ページのもう片方のダウンロード欄を保持します。
+
+Paper版はMinecraft 26.3・Java 25向けです。Paper APIの固定バージョンは`build/gradle.properties`の`paper_api_version`で管理します。Gradle構成は`build/paper/`、プラグインの実装は`source/paper/java/`、共通JSONからの生成処理は`helper/paper_release.py`です。生成Java・プラグイン定義・リソースパックは`intermediate/paper-generated/`、ビルド済みJARは`intermediate/paper-output/libs/`に保存します。通常は上記のPythonスクリプトで生成とビルドをまとめて実行してください。
+
+`deliverables/downloads/`に次のファイルと、それぞれのSHA-256ファイルを生成します。
+
+- `culinary-expansion-paper-<Minecraftバージョン>-<プロジェクトバージョン>.jar`
+- `culinary-expansion-paper-resources-<Minecraftバージョン>-<プロジェクトバージョン>.zip`
+
+JARをPaperサーバーの`plugins/`に入れて再起動します。クライアントにはMODが不要です。リソースパックZIPを参加者の`resourcepacks/`に配置して有効化すると、料理の画像と翻訳名が表示されます。サーバーの`server.properties`の`resource-pack`に公開ZIPのURLを設定して配布することもできます。リソースパックなしでは料理は紙の見た目になります。
+
+共通定義の組込み対象だけを登録し、回復量、満腹度、食べる時間、効果と確率、返却容器、スタック数、クラフト・精錬・燻製・焚き火のレシピを反映します。管理者は`/culinary <アイテムID>`で料理を取得できます（権限`culinary.give`、既定はOP）。料理は通常のレシピでも作成できます。Paper版は既存の紙に専用データを付けて識別するため、Forge版のアイテムIDやワールドデータとは互換性がありません。Forge版のクリエイティブタブやレシピ解除の進捗はPaper版には追加しません。
+
+Paper版はビルド入力のハッシュをJARとリソースパックに記録し、定義・ソース・リソース・設定が変わった状態で`--pages-only`を実行すると再ビルドを要求します。
 
 [GitHub Pagesの公開元設定](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
 
