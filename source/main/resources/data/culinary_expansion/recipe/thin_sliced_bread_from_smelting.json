@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "minecraft:egg",
+  "result": {
+    "id": "culinary_expansion:thin_sliced_bread",
+    "count": 1
+  },
+  "experience": 0.35,
+  "cookingtime": 200
+}

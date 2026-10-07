@@ -1,0 +1,11 @@
+{
+  "category": "misc",
+  "result": {
+    "id": "culinary_expansion:thick_sliced_bread",
+    "count": 3
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "culinary_expansion:loaf_bread"
+  ]
+}

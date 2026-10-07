@@ -1,0 +1,14 @@
+{
+  "category": "misc",
+  "result": {
+    "id": "culinary_expansion:milk_bottle",
+    "count": 3
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:milk_bucket",
+    "minecraft:glass_bottle",
+    "minecraft:glass_bottle",
+    "minecraft:glass_bottle"
+  ]
+}

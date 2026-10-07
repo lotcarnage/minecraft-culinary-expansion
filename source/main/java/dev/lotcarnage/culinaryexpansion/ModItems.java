@@ -18,11 +18,16 @@ public final class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
     public static final RegistryObject<Item> FRIED_EGG = ITEMS.register("fried_egg", () -> new Item(new Item.Properties().setId(ITEMS.key("fried_egg")).stacksTo(64).food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.6F).build(), Consumable.builder().consumeSeconds(1.6F).build())));
     public static final RegistryObject<Item> CHOCOLATE = ITEMS.register("chocolate", () -> new Item(new Item.Properties().setId(ITEMS.key("chocolate")).stacksTo(64).food(new FoodProperties.Builder().nutrition(1).saturationModifier(0.1F).build(), Consumable.builder().consumeSeconds(0.5F).build())));
-    public static final RegistryObject<Item> RAW_MEAT_PATTY = ITEMS.register("raw_meat_patty", () -> new Item(new Item.Properties().setId(ITEMS.key("raw_meat_patty")).stacksTo(64).food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.3F).build(), Consumable.builder().consumeSeconds(1.6F).onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.POISON, 100, 0), 1.0F)).build())));
+    public static final RegistryObject<Item> RAW_MEAT_PATTY = ITEMS.register("raw_meat_patty", () -> new Item(new Item.Properties().setId(ITEMS.key("raw_meat_patty")).stacksTo(64).food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.3F).build(), Consumable.builder().consumeSeconds(1.6F).onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.POISON, 100, 0), 0.25F)).build())));
     public static final RegistryObject<Item> HAMBURG_STEAK = ITEMS.register("hamburg_steak", () -> new Item(new Item.Properties().setId(ITEMS.key("hamburg_steak")).stacksTo(64).food(new FoodProperties.Builder().nutrition(8).saturationModifier(0.8F).build(), Consumable.builder().consumeSeconds(1.6F).build())));
     public static final RegistryObject<Item> HAMBURGER = ITEMS.register("hamburger", () -> new Item(new Item.Properties().setId(ITEMS.key("hamburger")).stacksTo(64).food(new FoodProperties.Builder().nutrition(9).saturationModifier(0.6F).build(), Consumable.builder().consumeSeconds(1.6F).build())));
     public static final RegistryObject<Item> SWEET_BERRY_JUICE = ITEMS.register("sweet_berry_juice", () -> new Item(new Item.Properties().setId(ITEMS.key("sweet_berry_juice")).stacksTo(64).food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.1F).alwaysEdible().build(), Consumable.builder().consumeSeconds(1.6F).onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 600, 0), 1.0F)).build()).usingConvertsTo(Items.GLASS_BOTTLE)));
+    public static final RegistryObject<Item> MILK_BOTTLE = ITEMS.register("milk_bottle", () -> new Item(new Item.Properties().setId(ITEMS.key("milk_bottle")).stacksTo(64).food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.4F).build(), Consumable.builder().consumeSeconds(1.6F).build()).usingConvertsTo(Items.GLASS_BOTTLE)));
+    public static final RegistryObject<Item> MILK_COCOA = ITEMS.register("milk_cocoa", () -> new Item(new Item.Properties().setId(ITEMS.key("milk_cocoa")).stacksTo(64).food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.4F).build(), Consumable.builder().consumeSeconds(1.6F).build()).usingConvertsTo(Items.GLASS_BOTTLE)));
+    public static final RegistryObject<Item> SWEET_BERRY_MILK = ITEMS.register("sweet_berry_milk", () -> new Item(new Item.Properties().setId(ITEMS.key("sweet_berry_milk")).stacksTo(64).food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.4F).build(), Consumable.builder().consumeSeconds(1.6F).onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 600, 0), 1.0F)).build()).usingConvertsTo(Items.GLASS_BOTTLE)));
     public static final RegistryObject<Item> LOAF_BREAD = ITEMS.register("loaf_bread", () -> new Item(new Item.Properties().setId(ITEMS.key("loaf_bread")).stacksTo(64).food(new FoodProperties.Builder().nutrition(15).saturationModifier(0.6F).build(), Consumable.builder().consumeSeconds(4.8F).build())));
+    public static final RegistryObject<Item> THICK_SLICED_BREAD = ITEMS.register("thick_sliced_bread", () -> new Item(new Item.Properties().setId(ITEMS.key("thick_sliced_bread")).stacksTo(64).food(new FoodProperties.Builder().nutrition(5).saturationModifier(0.6F).build(), Consumable.builder().consumeSeconds(1.6F).build())));
+    public static final RegistryObject<Item> THIN_SLICED_BREAD = ITEMS.register("thin_sliced_bread", () -> new Item(new Item.Properties().setId(ITEMS.key("thin_sliced_bread")).stacksTo(64).food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.6F).build(), Consumable.builder().consumeSeconds(1.6F).build())));
     public static void register(FMLJavaModLoadingContext context) {
         ITEMS.register(context.getModBusGroup());
         BuildCreativeModeTabContentsEvent.BUS.addListener(ModItems::addFood);
@@ -35,7 +40,12 @@ public final class ModItems {
             event.accept(HAMBURG_STEAK);
             event.accept(HAMBURGER);
             event.accept(SWEET_BERRY_JUICE);
+            event.accept(MILK_BOTTLE);
+            event.accept(MILK_COCOA);
+            event.accept(SWEET_BERRY_MILK);
             event.accept(LOAF_BREAD);
+            event.accept(THICK_SLICED_BREAD);
+            event.accept(THIN_SLICED_BREAD);
         }
     }
 }

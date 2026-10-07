@@ -34,7 +34,8 @@ class ItemEditor:
         window.protocol('WM_DELETE_WINDOW',self.close)
         bar=ttk.Frame(window,padding=6);bar.pack(fill='x')
         for label,command in [('開く',self.open),('保存',self.save),('名前を付けて保存',self.save_as),
-                              ('追加',self.add),('削除',self.delete),('定義へ反映',self.apply),('テクスチャ取込',self.import_texture),
+                              ('追加',self.add),('削除',self.delete),('上へ',lambda:self.move_item(-1)),('下へ',lambda:self.move_item(1)),
+                              ('定義へ反映',self.apply),('テクスチャ取込',self.import_texture),
                               ('一覧を開く',self.dashboard),('公式食料の参考値',self.show_food_reference)]:
             ttk.Button(bar,text=label,command=command).pack(side='left',padx=2)
         metadata_bar=ttk.Frame(window,padding=6);metadata_bar.pack(fill='x')
@@ -315,6 +316,19 @@ class ItemEditor:
             model.ensure_texture(candidate['items'][-1])
         except Exception as error:messagebox.showerror('追加エラー',str(error),parent=self.window);return
         self.project=candidate;self.dirty=True;self.refresh(len(candidate['items'])-1)
+
+    def move_item(self,direction):
+        if self.pending():return
+        index=self.selected()
+        if index is None:return
+        destination=index+direction
+        items=self.project['items']
+        if not 0<=destination<len(items):return
+        items[index],items[destination]=items[destination],items[index]
+        self.dirty=True;self.edit_target=None
+        self.refresh(destination)
+        self.tree.focus(f'item{destination}')
+        self.tree.see(f'item{destination}')
 
     def apply(self):
         if self.pending():return False
