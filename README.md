@@ -61,7 +61,9 @@ Windows・Linux・macOSで同じPythonスクリプトを使用できます。環
 
 配布物生成の順序は「JSONから生成 → Gradleビルド → JAR検査 → `deliverables/downloads/`とチェックサム・配布ページを更新」です。このスクリプトの操作はリポジトリ内に閉じ、Minecraftのゲームフォルダへのインストールは行いません。完了メッセージと終了コード0を確認してください。失敗時は以後の工程を実行せず、古い配布物が残っていても今回の生成結果として扱いません。
 
-WindowsのPATHがJava 8を指している場合も、`intermediate/jdk25/`以下に展開済みのJDK 25があれば自動で使います。Gradleのキャッシュは`intermediate/gradle-user-home/`に保存します（`GRADLE_USER_HOME`指定時はその値を優先します）。Pythonファイルの関連付けに依存せず、上記のように`python helper/build_deliverable.py`で実行してください。
+WindowsのPATHがJava 8を指している場合も、`intermediate/jdk25/`以下に展開済みのJDK 25があれば自動で使います。Windows x64では、`--java-home`と`JAVA_HOME`が未指定でローカルJDKがない場合、`helper/setup_jdk.py`がMicrosoft Build of OpenJDK 25.0.4.1を公式の固定バージョンURLから取得し、公式SHA-256と照合してから同ディレクトリに展開します。取得URLとハッシュは展開先の`download-source.txt`に記録します。システムへのインストールや永続的な環境変数変更は行いません。`python helper/setup_jdk.py`でセットアップだけを実行できます。`intermediate/`を削除した場合も、この手順で復元できます。Pythonは事前にインストールしてください。その他のOS・CPUではJDK 25を用意して`--java-home`で指定します。配布元・ライセンスは[Microsoftの公式案内](https://learn.microsoft.com/en-us/java/openjdk/download)を参照してください。
+
+Gradleのキャッシュは`intermediate/gradle-user-home/`に保存します（`GRADLE_USER_HOME`指定時はその値を優先します）。Pythonファイルの関連付けに依存せず、上記のように`python helper/build_deliverable.py`で実行してください。
 
 操作の詳細は[アイテムエディターの開発文書](document/item_editor.md)、開発用クライアントの起動などは[開発文書](document/README.md)を参照してください。
 

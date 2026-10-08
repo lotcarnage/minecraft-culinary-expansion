@@ -180,6 +180,9 @@ def build(java_home, platform='forge', config=None):
         candidates = sorted((ROOT / 'intermediate/jdk25').glob('*/bin/javac.exe'))
         if candidates:
             java_home = candidates[-1].parent.parent
+        elif os.name == 'nt':
+            import setup_jdk
+            java_home = setup_jdk.ensure_jdk(ROOT)
     env.setdefault('GRADLE_USER_HOME', str(ROOT / 'intermediate/gradle-user-home'))
     if java_home:
         home = Path(java_home).expanduser().resolve()
