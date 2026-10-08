@@ -1,0 +1,14 @@
+{
+  "category": "misc",
+  "result": {
+    "id": "culinary_expansion:butter_toast",
+    "count": 3
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "culinary_expansion:butter",
+    "culinary_expansion:thin_sliced_toast",
+    "culinary_expansion:thin_sliced_toast",
+    "culinary_expansion:thin_sliced_toast"
+  ]
+}

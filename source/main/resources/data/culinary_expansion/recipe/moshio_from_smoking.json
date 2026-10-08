@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smoking",
+  "category": "misc",
+  "ingredient": "minecraft:seagrass",
+  "result": {
+    "id": "culinary_expansion:moshio",
+    "count": 1
+  },
+  "experience": 0.35,
+  "cookingtime": 800
+}

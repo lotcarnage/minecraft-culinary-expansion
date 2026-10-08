@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": "culinary_expansion:moshio",
+  "result": {
+    "id": "culinary_expansion:salt",
+    "count": 1
+  },
+  "experience": 0.35,
+  "cookingtime": 800
+}

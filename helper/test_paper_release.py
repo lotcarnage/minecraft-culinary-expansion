@@ -47,6 +47,17 @@ class PaperReleaseTests(unittest.TestCase):
             self.assertNotIn('assets/culinary_expansion/items/salt.json', archive.namelist())
             self.assertIn('item.culinary_expansion.fried_egg', json.loads(archive.read('assets/culinary_expansion/lang/ja_jp.json')))
 
+    def test_nonfood_flag_is_passed_to_paper_factory(self):
+        path=self.root/'source/items_project.json'
+        project=json.loads(path.read_text(encoding='utf-8'))
+        project['items'][0]['edible']=False
+        path.write_text(json.dumps(project),encoding='utf-8')
+        paper.generate(self.root,self.config)
+        java=(self.root/'intermediate/paper-generated/java/dev/lotcarnage/culinaryexpansion/paper/GeneratedContent.java').read_text()
+        line=next(line for line in java.splitlines() if 'p.item("fried_egg"' in line)
+        self.assertTrue(line.endswith(', false);'))
+        self.assertIn('p.ingredient("minecraft:egg")',java)
+
     def test_stale_item_definitions_stop_release(self):
         self.fake_jar()
         paper.prepare(self.root, self.config)

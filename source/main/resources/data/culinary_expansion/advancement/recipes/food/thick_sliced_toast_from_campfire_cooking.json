@@ -4,7 +4,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipes": "culinary_expansion:salt_from_crafting"
+        "recipes": "culinary_expansion:thick_sliced_toast_from_campfire_cooking"
       }
     },
     "has_material_0": {
@@ -12,7 +12,7 @@
       "conditions": {
         "items": [
           {
-            "items": "culinary_expansion:salt_bucket"
+            "items": "culinary_expansion:thick_sliced_bread"
           }
         ]
       }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "culinary_expansion:salt_from_crafting"
+      "culinary_expansion:thick_sliced_toast_from_campfire_cooking"
     ]
   }
 }

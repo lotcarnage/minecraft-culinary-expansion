@@ -52,7 +52,7 @@ def generate(root, config):
                   quote(item_project.REMAINDERS[item['remainder']] or ''),
                   quote(item_project.EFFECTS[item['effect']] or ''), str(item['effect_ticks']),
                   str(item['effect_level'] - 1), str(item['effect_probability'])]
-        lines.append('p.item(' + ', '.join(values) + ');')
+        lines.append('p.item(' + ', '.join(values) + ', ' + str(item['edible']).lower() + ');')
     recipe_root = root / 'source/main/resources/data/culinary_expansion/recipe'
     disabled = {i['name'] for i in project['items']} - enabled
     for path in sorted(recipe_root.glob('*.json')):

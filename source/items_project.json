@@ -35,7 +35,8 @@
         "不要",
         "不要"
       ],
-      "enabled": true
+      "enabled": true,
+      "edible": true
     },
     {
       "name": "chocolate",
@@ -71,7 +72,8 @@
         "不要",
         "不要"
       ],
-      "enabled": true
+      "enabled": true,
+      "edible": true
     },
     {
       "name": "raw_meat_patty",
@@ -107,7 +109,8 @@
         "不要",
         "不要"
       ],
-      "enabled": true
+      "enabled": true,
+      "edible": true
     },
     {
       "name": "hamburg_steak",
@@ -143,7 +146,8 @@
         "不要",
         "不要"
       ],
-      "enabled": true
+      "enabled": true,
+      "edible": true
     },
     {
       "name": "hamburger",
@@ -179,7 +183,8 @@
         "不要",
         "不要"
       ],
-      "enabled": true
+      "enabled": true,
+      "edible": true
     },
     {
       "name": "sweet_berry_juice",
@@ -215,7 +220,8 @@
         "minecraft:sweet_berries",
         "minecraft:glass_bottle"
       ],
-      "enabled": true
+      "enabled": true,
+      "edible": true
     },
     {
       "name": "milk_bottle",
@@ -251,7 +257,8 @@
         "不要",
         "不要"
       ],
-      "enabled": true
+      "enabled": true,
+      "edible": true
     },
     {
       "name": "milk_cocoa",
@@ -287,7 +294,8 @@
         "不要",
         "不要"
       ],
-      "enabled": true
+      "enabled": true,
+      "edible": true
     },
     {
       "name": "sweet_berry_milk",
@@ -323,7 +331,45 @@
         "不要",
         "不要"
       ],
-      "enabled": true
+      "enabled": true,
+      "edible": true
+    },
+    {
+      "name": "flour",
+      "enabled": true,
+      "ja_name": "小麦粉",
+      "en_name": "Flour",
+      "stack_size": 64,
+      "nutrition": 1,
+      "saturation_modifier": 0.1,
+      "always_edible": false,
+      "consume_seconds": 1.6,
+      "effect": "なし",
+      "effect_ticks": 200,
+      "effect_level": 1,
+      "effect_probability": 1.0,
+      "remainder": "なし",
+      "smelting": false,
+      "smoking": false,
+      "cooking_ticks": 200,
+      "experience": 0.35,
+      "cooking_ingredient": "minecraft:egg",
+      "cooking_output": 1,
+      "campfire_ticks": null,
+      "crafting": "不定形",
+      "crafting_output": 1,
+      "crafting_slots": [
+        "minecraft:wheat",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要"
+      ],
+      "edible": true
     },
     {
       "name": "loaf_bread",
@@ -349,17 +395,18 @@
       "crafting": "定型",
       "crafting_output": 1,
       "crafting_slots": [
-        "minecraft:wheat",
-        "minecraft:wheat",
-        "minecraft:wheat",
-        "minecraft:wheat",
-        "minecraft:wheat",
-        "minecraft:wheat",
-        "minecraft:wheat",
-        "minecraft:wheat",
-        "minecraft:wheat"
+        "culinary_expansion:flour",
+        "culinary_expansion:flour",
+        "culinary_expansion:flour",
+        "culinary_expansion:flour",
+        "culinary_expansion:flour",
+        "culinary_expansion:flour",
+        "culinary_expansion:flour",
+        "culinary_expansion:flour",
+        "culinary_expansion:flour"
       ],
-      "enabled": true
+      "enabled": true,
+      "edible": true
     },
     {
       "name": "thick_sliced_bread",
@@ -395,7 +442,8 @@
         "不要",
         "不要",
         "不要"
-      ]
+      ],
+      "edible": true
     },
     {
       "name": "thin_sliced_bread",
@@ -427,6 +475,229 @@
         "不要",
         "不要",
         "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要"
+      ],
+      "edible": true
+    },
+    {
+      "name": "thick_sliced_toast",
+      "enabled": true,
+      "ja_name": "厚切りトースト",
+      "en_name": "Thick Sliced Toast",
+      "edible": true,
+      "stack_size": 64,
+      "nutrition": 5,
+      "saturation_modifier": 0.6,
+      "always_edible": false,
+      "consume_seconds": 1.6,
+      "effect": "なし",
+      "effect_ticks": 200,
+      "effect_level": 1,
+      "effect_probability": 1.0,
+      "remainder": "なし",
+      "smelting": true,
+      "smoking": false,
+      "cooking_ticks": 50,
+      "experience": 0.35,
+      "cooking_ingredient": "culinary_expansion:thick_sliced_bread",
+      "cooking_output": 1,
+      "campfire_ticks": 150,
+      "crafting": "クラフト不可",
+      "crafting_output": 1,
+      "crafting_slots": [
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要"
+      ]
+    },
+    {
+      "name": "thin_sliced_toast",
+      "enabled": true,
+      "ja_name": "薄切りトースト",
+      "en_name": "Thin-Sliced Toast",
+      "edible": true,
+      "stack_size": 64,
+      "nutrition": 3,
+      "saturation_modifier": 0.6,
+      "always_edible": false,
+      "consume_seconds": 1.6,
+      "effect": "なし",
+      "effect_ticks": 200,
+      "effect_level": 1,
+      "effect_probability": 1.0,
+      "remainder": "なし",
+      "smelting": true,
+      "smoking": false,
+      "cooking_ticks": 50,
+      "experience": 0.35,
+      "cooking_ingredient": "culinary_expansion:thin_sliced_bread",
+      "cooking_output": 1,
+      "campfire_ticks": 150,
+      "crafting": "クラフト不可",
+      "crafting_output": 1,
+      "crafting_slots": [
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要"
+      ]
+    },
+    {
+      "name": "moshio",
+      "enabled": true,
+      "ja_name": "藻塩",
+      "en_name": "Seaweed Salt",
+      "edible": false,
+      "stack_size": 64,
+      "nutrition": 0,
+      "saturation_modifier": 0.6,
+      "always_edible": false,
+      "consume_seconds": 1.6,
+      "effect": "なし",
+      "effect_ticks": 200,
+      "effect_level": 1,
+      "effect_probability": 1.0,
+      "remainder": "なし",
+      "smelting": false,
+      "smoking": true,
+      "cooking_ticks": 800,
+      "experience": 0.35,
+      "cooking_ingredient": "minecraft:seagrass",
+      "cooking_output": 1,
+      "campfire_ticks": null,
+      "crafting": "クラフト不可",
+      "crafting_output": 1,
+      "crafting_slots": [
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要"
+      ]
+    },
+    {
+      "name": "salt",
+      "ja_name": "塩",
+      "en_name": "Salt",
+      "stack_size": 64,
+      "nutrition": 0,
+      "saturation_modifier": 0.0,
+      "always_edible": false,
+      "consume_seconds": 1.6,
+      "effect": "なし",
+      "effect_ticks": 200,
+      "effect_level": 1,
+      "effect_probability": 1.0,
+      "remainder": "なし",
+      "smelting": true,
+      "smoking": false,
+      "cooking_ticks": 800,
+      "experience": 0.35,
+      "cooking_ingredient": "culinary_expansion:moshio",
+      "cooking_output": 1,
+      "campfire_ticks": null,
+      "crafting": "クラフト不可",
+      "crafting_output": 1,
+      "crafting_slots": [
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要"
+      ],
+      "enabled": true,
+      "edible": false
+    },
+    {
+      "name": "butter",
+      "enabled": true,
+      "ja_name": "バター",
+      "en_name": "Butter",
+      "edible": true,
+      "stack_size": 64,
+      "nutrition": 3,
+      "saturation_modifier": 0.8,
+      "always_edible": false,
+      "consume_seconds": 1.6,
+      "effect": "吐き気",
+      "effect_ticks": 200,
+      "effect_level": 2,
+      "effect_probability": 0.125,
+      "remainder": "なし",
+      "smelting": false,
+      "smoking": false,
+      "cooking_ticks": 200,
+      "experience": 0.35,
+      "cooking_ingredient": "minecraft:egg",
+      "cooking_output": 1,
+      "campfire_ticks": null,
+      "crafting": "不定形",
+      "crafting_output": 1,
+      "crafting_slots": [
+        "minecraft:milk_bucket",
+        "culinary_expansion:salt",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要",
+        "不要"
+      ]
+    },
+    {
+      "name": "butter_toast",
+      "enabled": true,
+      "ja_name": "バタートースト",
+      "en_name": "Butter Toast",
+      "edible": true,
+      "stack_size": 64,
+      "nutrition": 5,
+      "saturation_modifier": 0.8,
+      "always_edible": false,
+      "consume_seconds": 1.6,
+      "effect": "なし",
+      "effect_ticks": 200,
+      "effect_level": 1,
+      "effect_probability": 1.0,
+      "remainder": "なし",
+      "smelting": false,
+      "smoking": false,
+      "cooking_ticks": 200,
+      "experience": 0.35,
+      "cooking_ingredient": "minecraft:egg",
+      "cooking_output": 1,
+      "campfire_ticks": null,
+      "crafting": "不定形",
+      "crafting_output": 3,
+      "crafting_slots": [
+        "culinary_expansion:butter",
+        "culinary_expansion:thin_sliced_toast",
+        "不要",
+        "culinary_expansion:thin_sliced_toast",
+        "culinary_expansion:thin_sliced_toast",
         "不要",
         "不要",
         "不要",
@@ -467,43 +738,8 @@
         "不要",
         "不要"
       ],
-      "enabled": false
-    },
-    {
-      "name": "salt",
-      "ja_name": "塩",
-      "en_name": "Salt",
-      "stack_size": 64,
-      "nutrition": 0,
-      "saturation_modifier": 0.0,
-      "always_edible": false,
-      "consume_seconds": 1.6,
-      "effect": "なし",
-      "effect_ticks": 200,
-      "effect_level": 1,
-      "effect_probability": 1.0,
-      "remainder": "なし",
-      "smelting": false,
-      "smoking": false,
-      "cooking_ticks": 200,
-      "experience": 0.35,
-      "cooking_ingredient": "minecraft:egg",
-      "cooking_output": 1,
-      "campfire_ticks": null,
-      "crafting": "不定形",
-      "crafting_output": 1,
-      "crafting_slots": [
-        "culinary_expansion:salt_bucket",
-        "不要",
-        "不要",
-        "不要",
-        "不要",
-        "不要",
-        "不要",
-        "不要",
-        "不要"
-      ],
-      "enabled": false
+      "enabled": false,
+      "edible": true
     },
     {
       "name": "salted_pork",
@@ -539,7 +775,8 @@
         "minecraft:porkchop",
         "culinary_expansion:salt"
       ],
-      "enabled": false
+      "enabled": false,
+      "edible": true
     },
     {
       "name": "bacon",
@@ -575,7 +812,8 @@
         "不要",
         "不要"
       ],
-      "enabled": false
+      "enabled": false,
+      "edible": true
     },
     {
       "name": "pork_block",
@@ -611,7 +849,8 @@
         "minecraft:porkchop",
         "minecraft:porkchop"
       ],
-      "enabled": false
+      "enabled": false,
+      "edible": true
     },
     {
       "name": "lard_block",
@@ -647,7 +886,8 @@
         "不要",
         "不要"
       ],
-      "enabled": false
+      "enabled": false,
+      "edible": true
     },
     {
       "name": "lard_grain",
@@ -683,7 +923,8 @@
         "不要",
         "不要"
       ],
-      "enabled": false
+      "enabled": false,
+      "edible": true
     },
     {
       "name": "raw_french_fries",
@@ -719,7 +960,8 @@
         "不要",
         "不要"
       ],
-      "enabled": false
+      "enabled": false,
+      "edible": true
     },
     {
       "name": "fresh_french_fries",
@@ -755,7 +997,8 @@
         "不要",
         "不要"
       ],
-      "enabled": false
+      "enabled": false,
+      "edible": true
     },
     {
       "name": "french_fries",
@@ -791,7 +1034,8 @@
         "不要",
         "不要"
       ],
-      "enabled": false
+      "enabled": false,
+      "edible": true
     },
     {
       "name": "kelp_stock",
@@ -827,14 +1071,18 @@
         "不要",
         "不要"
       ],
-      "enabled": false
+      "enabled": false,
+      "edible": true
     }
   ],
   "generated_files": [
     "source/main/java/dev/lotcarnage/culinaryexpansion/CulinaryExpansion.java",
     "source/main/java/dev/lotcarnage/culinaryexpansion/ModItems.java",
     "source/main/resources/assets/culinary_expansion/items/bacon.json",
+    "source/main/resources/assets/culinary_expansion/items/butter.json",
+    "source/main/resources/assets/culinary_expansion/items/butter_toast.json",
     "source/main/resources/assets/culinary_expansion/items/chocolate.json",
+    "source/main/resources/assets/culinary_expansion/items/flour.json",
     "source/main/resources/assets/culinary_expansion/items/french_fries.json",
     "source/main/resources/assets/culinary_expansion/items/fresh_french_fries.json",
     "source/main/resources/assets/culinary_expansion/items/fried_egg.json",
@@ -846,6 +1094,7 @@
     "source/main/resources/assets/culinary_expansion/items/loaf_bread.json",
     "source/main/resources/assets/culinary_expansion/items/milk_bottle.json",
     "source/main/resources/assets/culinary_expansion/items/milk_cocoa.json",
+    "source/main/resources/assets/culinary_expansion/items/moshio.json",
     "source/main/resources/assets/culinary_expansion/items/pork_block.json",
     "source/main/resources/assets/culinary_expansion/items/raw_french_fries.json",
     "source/main/resources/assets/culinary_expansion/items/raw_meat_patty.json",
@@ -855,11 +1104,16 @@
     "source/main/resources/assets/culinary_expansion/items/sweet_berry_juice.json",
     "source/main/resources/assets/culinary_expansion/items/sweet_berry_milk.json",
     "source/main/resources/assets/culinary_expansion/items/thick_sliced_bread.json",
+    "source/main/resources/assets/culinary_expansion/items/thick_sliced_toast.json",
     "source/main/resources/assets/culinary_expansion/items/thin_sliced_bread.json",
+    "source/main/resources/assets/culinary_expansion/items/thin_sliced_toast.json",
     "source/main/resources/assets/culinary_expansion/lang/en_us.json",
     "source/main/resources/assets/culinary_expansion/lang/ja_jp.json",
     "source/main/resources/assets/culinary_expansion/models/item/bacon.json",
+    "source/main/resources/assets/culinary_expansion/models/item/butter.json",
+    "source/main/resources/assets/culinary_expansion/models/item/butter_toast.json",
     "source/main/resources/assets/culinary_expansion/models/item/chocolate.json",
+    "source/main/resources/assets/culinary_expansion/models/item/flour.json",
     "source/main/resources/assets/culinary_expansion/models/item/french_fries.json",
     "source/main/resources/assets/culinary_expansion/models/item/fresh_french_fries.json",
     "source/main/resources/assets/culinary_expansion/models/item/fried_egg.json",
@@ -871,6 +1125,7 @@
     "source/main/resources/assets/culinary_expansion/models/item/loaf_bread.json",
     "source/main/resources/assets/culinary_expansion/models/item/milk_bottle.json",
     "source/main/resources/assets/culinary_expansion/models/item/milk_cocoa.json",
+    "source/main/resources/assets/culinary_expansion/models/item/moshio.json",
     "source/main/resources/assets/culinary_expansion/models/item/pork_block.json",
     "source/main/resources/assets/culinary_expansion/models/item/raw_french_fries.json",
     "source/main/resources/assets/culinary_expansion/models/item/raw_meat_patty.json",
@@ -880,9 +1135,14 @@
     "source/main/resources/assets/culinary_expansion/models/item/sweet_berry_juice.json",
     "source/main/resources/assets/culinary_expansion/models/item/sweet_berry_milk.json",
     "source/main/resources/assets/culinary_expansion/models/item/thick_sliced_bread.json",
+    "source/main/resources/assets/culinary_expansion/models/item/thick_sliced_toast.json",
     "source/main/resources/assets/culinary_expansion/models/item/thin_sliced_bread.json",
+    "source/main/resources/assets/culinary_expansion/models/item/thin_sliced_toast.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/bacon_from_smoking.json",
+    "source/main/resources/data/culinary_expansion/advancement/recipes/food/butter_from_crafting.json",
+    "source/main/resources/data/culinary_expansion/advancement/recipes/food/butter_toast_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/chocolate_from_crafting.json",
+    "source/main/resources/data/culinary_expansion/advancement/recipes/food/flour_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/french_fries_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/fresh_french_fries_from_smelting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/fried_egg_from_smelting.json",
@@ -894,17 +1154,25 @@
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/loaf_bread_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/milk_bottle_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/milk_cocoa_from_crafting.json",
+    "source/main/resources/data/culinary_expansion/advancement/recipes/food/moshio_from_smoking.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/pork_block_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/raw_french_fries_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/raw_meat_patty_from_crafting.json",
-    "source/main/resources/data/culinary_expansion/advancement/recipes/food/salt_from_crafting.json",
+    "source/main/resources/data/culinary_expansion/advancement/recipes/food/salt_from_smelting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/salted_pork_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/sweet_berry_juice_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/sweet_berry_milk_from_crafting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/thick_sliced_bread_from_crafting.json",
+    "source/main/resources/data/culinary_expansion/advancement/recipes/food/thick_sliced_toast_from_campfire_cooking.json",
+    "source/main/resources/data/culinary_expansion/advancement/recipes/food/thick_sliced_toast_from_smelting.json",
     "source/main/resources/data/culinary_expansion/advancement/recipes/food/thin_sliced_bread_from_crafting.json",
+    "source/main/resources/data/culinary_expansion/advancement/recipes/food/thin_sliced_toast_from_campfire_cooking.json",
+    "source/main/resources/data/culinary_expansion/advancement/recipes/food/thin_sliced_toast_from_smelting.json",
     "source/main/resources/data/culinary_expansion/recipe/bacon_from_smoking.json",
+    "source/main/resources/data/culinary_expansion/recipe/butter_from_crafting.json",
+    "source/main/resources/data/culinary_expansion/recipe/butter_toast_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/chocolate_from_crafting.json",
+    "source/main/resources/data/culinary_expansion/recipe/flour_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/french_fries_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/fresh_french_fries_from_smelting.json",
     "source/main/resources/data/culinary_expansion/recipe/fried_egg_from_smelting.json",
@@ -916,15 +1184,20 @@
     "source/main/resources/data/culinary_expansion/recipe/loaf_bread_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/milk_bottle_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/milk_cocoa_from_crafting.json",
+    "source/main/resources/data/culinary_expansion/recipe/moshio_from_smoking.json",
     "source/main/resources/data/culinary_expansion/recipe/pork_block_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/raw_french_fries_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/raw_meat_patty_from_crafting.json",
-    "source/main/resources/data/culinary_expansion/recipe/salt_from_crafting.json",
+    "source/main/resources/data/culinary_expansion/recipe/salt_from_smelting.json",
     "source/main/resources/data/culinary_expansion/recipe/salted_pork_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/sweet_berry_juice_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/sweet_berry_milk_from_crafting.json",
     "source/main/resources/data/culinary_expansion/recipe/thick_sliced_bread_from_crafting.json",
-    "source/main/resources/data/culinary_expansion/recipe/thin_sliced_bread_from_crafting.json"
+    "source/main/resources/data/culinary_expansion/recipe/thick_sliced_toast_from_campfire_cooking.json",
+    "source/main/resources/data/culinary_expansion/recipe/thick_sliced_toast_from_smelting.json",
+    "source/main/resources/data/culinary_expansion/recipe/thin_sliced_bread_from_crafting.json",
+    "source/main/resources/data/culinary_expansion/recipe/thin_sliced_toast_from_campfire_cooking.json",
+    "source/main/resources/data/culinary_expansion/recipe/thin_sliced_toast_from_smelting.json"
   ],
   "planned_mechanics": {
     "status": "仕様のみ。標準ジェネレーターはこの項目を実装しません。",
@@ -975,5 +1248,5 @@
     "vanilla_recipes": "既存レシピを置換せず、専用アイテムと材料の組み合わせで追加します。",
     "provisional_properties": "追加アイテムの食料値は未決定のため0に仮設定しています。ブロック名のアイテムの設置可否は未決定です。"
   },
-  "version": "0.1.4"
+  "version": "0.1.5"
 }

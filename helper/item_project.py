@@ -66,7 +66,7 @@ FIELD_LABELS = {
     'effect_probability': '効果発生確率', 'cooking_ticks': '基準調理時間',
     'experience': '調理経験値', 'cooking_output': '調理出力個数',
     'crafting_output': 'クラフト出力個数', 'campfire_ticks': '焚き火の調理時間',
-    'enabled': '組込み', 'always_edible': '満腹時使用', 'smelting': 'かまど対応',
+    'edible': '食べられる', 'enabled': '組込み', 'always_edible': '満腹時使用', 'smelting': 'かまど対応',
     'smoking': '燻製器対応',
 }
 
@@ -74,7 +74,7 @@ FIELD_LABELS = {
 
 def default_item(name):
     return {'name': name, 'enabled': True, 'ja_name': name, 'en_name': name.replace('_', ' ').title(),
-            'stack_size': 64, 'nutrition': 5, 'saturation_modifier': 0.6,
+            'edible': True, 'stack_size': 64, 'nutrition': 5, 'saturation_modifier': 0.6,
             'always_edible': False, 'consume_seconds': 1.6, 'effect': 'なし',
             'effect_ticks': 200, 'effect_level': 1, 'effect_probability': 1.0, 'remainder': 'なし',
             'smelting': True, 'smoking': True, 'cooking_ticks': 200, 'experience': 0.35,
@@ -147,7 +147,7 @@ def validate(project):
                                ('effect_level',1,256,True),('effect_probability',0,1,False),('cooking_ticks',1,2147483647,True),
                                ('experience',0,100,False),('cooking_output',1,99,True),('crafting_output',1,99,True)]:
             number(item,k,lo,hi,integer)
-        for k in ('enabled','always_edible','smelting','smoking'):
+        for k in ('enabled','edible','always_edible','smelting','smoking'):
             if not isinstance(item[k],bool):raise ValueError(f'{FIELD_LABELS[k]}には有効・無効を指定してください。JSONではtrueまたはfalseを使います。')
         if item['campfire_ticks'] is not None: number(item,'campfire_ticks',1,2147483647,True)
         if item['effect'] not in EFFECTS or item['remainder'] not in REMAINDERS:raise ValueError('追加効果または使用後の残り物が選択肢にありません。')
@@ -168,6 +168,7 @@ def load(path=PROJECT):
     project.setdefault('version','0.1.0')
     for item in project.get('items', []):
         item.setdefault('enabled', item.get('nutrition', 0) > 0)
+        item.setdefault('edible', True)
     return validate(project)
 
 
@@ -203,7 +204,7 @@ def generated(project,root=ROOT):
         owned = {Path(p).stem for p in project.get('generated_files', []) if p.startswith(ASSETS+'items/')} | {i['name'] for i in project['items']}
         existing={k:v for k,v in existing.items() if k not in {f'item.{NS}.{name}' for name in owned}}
         existing.update({f'item.{NS}.{i["name"]}':i[field] for i in project['items'] if i['enabled']});add(path,existing)
-    registrations=[];accept=[]
+    registrations=[];accept=[];material_accept=[]
     disabled_refs={f'{NS}:{item["name"]}' for item in project['items'] if not item['enabled']}
     for item in project['items']:
         if not item['enabled']:continue
@@ -215,15 +216,16 @@ def generated(project,root=ROOT):
         if EFFECTS[item['effect']]:
             consumable+=f'.onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.{EFFECTS[item["effect"]]}, {item["effect_ticks"]}, {item["effect_level"]-1}), {item["effect_probability"]}F))'
         consumable+='.build()'
-        props=f'new Item.Properties().setId(ITEMS.key("{name}")).stacksTo({item["stack_size"]}).food({food}, {consumable})'
-        if REMAINDERS[item['remainder']]:props+=f'.usingConvertsTo(Items.{REMAINDERS[item["remainder"]]})'
+        props=f'new Item.Properties().setId(ITEMS.key("{name}")).stacksTo({item["stack_size"]})'
+        if item['edible']:props+=f'.food({food}, {consumable})'
+        if item['edible'] and REMAINDERS[item['remainder']]:props+=f'.usingConvertsTo(Items.{REMAINDERS[item["remainder"]]})'
         registrations.append(f'    public static final RegistryObject<Item> {name.upper()} = ITEMS.register("{name}", () -> new Item({props}));')
-        accept.append(f'            event.accept({name.upper()});')
+        (accept if item['edible'] else material_accept).append(f'            event.accept({name.upper()});')
         add(ASSETS+f'items/{name}.json',{'model':{'type':'minecraft:model','model':f'{NS}:item/{name}'}})
         add(ASSETS+f'models/item/{name}.json',{'parent':'minecraft:item/generated','textures':{'layer0':f'{NS}:item/{name}'}})
         recipes=[]
         for enabled,kind,ticks in [(item['smelting'],'smelting',item['cooking_ticks']), (item['smoking'],'smoking',item['cooking_ticks']), (item['campfire_ticks'] is not None,'campfire_cooking',item['campfire_ticks'])]:
-            if enabled:recipes.append((kind,{'type':f'minecraft:{kind}','category':'food','ingredient':item['cooking_ingredient'],'result':{'id':id,'count':item['cooking_output']},'experience':item['experience'],'cookingtime':ticks}))
+            if enabled:recipes.append((kind,{'type':f'minecraft:{kind}','category':'food' if item['edible'] else 'misc','ingredient':item['cooking_ingredient'],'result':{'id':id,'count':item['cooking_output']},'experience':item['experience'],'cookingtime':ticks}))
         if item['crafting']!='クラフト不可':
             slots=item['crafting_slots'];recipe={'category':'misc','result':{'id':id,'count':item['crafting_output']}}
             if item['crafting']=='不定形':recipe.update(type='minecraft:crafting_shapeless',ingredients=[v for v in slots if v!='不要'])
@@ -275,10 +277,12 @@ REGISTRATIONS
     private static void addFood(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
 ACCEPT
+        } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+MATERIAL_ROWS
         }
     }
 }
-'''.replace('REGISTRATIONS','\n'.join(registrations)).replace('ACCEPT','\n'.join(accept))
+'''.replace('REGISTRATIONS','\n'.join(registrations)).replace('ACCEPT','\n'.join(accept)).replace('MATERIAL_ROWS','\n'.join(material_accept))
     files[JAVA+'ModItems.java']=java.encode()
     files[JAVA+'CulinaryExpansion.java']=b'''package dev.lotcarnage.culinaryexpansion;
 import net.minecraftforge.fml.common.Mod;

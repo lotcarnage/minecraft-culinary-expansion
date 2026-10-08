@@ -108,6 +108,12 @@ def generate(output):
         if not food_known or not direct or '.component(' in expression:
             warnings.append('使用効果をソースで確認')
 
+        nonfood = direct and not food and '.component(' not in expression
+        if nonfood:
+            nutrition_cell=saturation_cell=recovery_cell=always_cell='対象外'
+            action_cell='食べられません'
+            warnings.remove('使用効果をソースで確認')
+
         effect = re.search(r'MobEffects\.([A-Z_]+),\s*(\d+),\s*(\d+)\),\s*([0-9.]+)F', expression)
         remainder = re.search(r'usingConvertsTo\(Items\.([A-Z_]+)\)', expression)
         effect_names = {'SPEED':'移動速度上昇','REGENERATION':'再生能力','FIRE_RESISTANCE':'耐火','NIGHT_VISION':'暗視','STRENGTH':'攻撃力上昇','POISON':'毒','HUNGER':'空腹','WITHER':'衰弱'}
@@ -115,6 +121,7 @@ def generate(output):
             effect_names.get(effect[1], effect[1]) if effect else 'なし', effect[2] if effect else '不要',
             str(int(effect[3])+1) if effect else '不要', effect[4] if effect else '不要',
             {'BOWL':'ボウル','GLASS_BOTTLE':'ガラス瓶','BUCKET':'バケツ'}.get(remainder[1], remainder[1]) if remainder else 'なし']
+        if nonfood:extra_attributes[identifier]=['対象外'] * 6
         recipe_cells, recipe_paths = [], []
         for path, recipe in recipes:
             result = recipe.get('result', {})

@@ -1,0 +1,11 @@
+{
+  "category": "misc",
+  "result": {
+    "id": "culinary_expansion:flour",
+    "count": 1
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:wheat"
+  ]
+}

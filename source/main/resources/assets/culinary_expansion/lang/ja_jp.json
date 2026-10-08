@@ -8,7 +8,14 @@
   "item.culinary_expansion.milk_bottle": "牛乳瓶",
   "item.culinary_expansion.milk_cocoa": "瓶入りミルクココア",
   "item.culinary_expansion.sweet_berry_milk": "スイートベリーミルク",
+  "item.culinary_expansion.flour": "小麦粉",
   "item.culinary_expansion.loaf_bread": "食パン",
   "item.culinary_expansion.thick_sliced_bread": "厚切り食パン",
-  "item.culinary_expansion.thin_sliced_bread": "薄切り食パン"
+  "item.culinary_expansion.thin_sliced_bread": "薄切り食パン",
+  "item.culinary_expansion.thick_sliced_toast": "厚切りトースト",
+  "item.culinary_expansion.thin_sliced_toast": "薄切りトースト",
+  "item.culinary_expansion.moshio": "藻塩",
+  "item.culinary_expansion.salt": "塩",
+  "item.culinary_expansion.butter": "バター",
+  "item.culinary_expansion.butter_toast": "バタートースト"
 }

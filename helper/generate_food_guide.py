@@ -16,14 +16,8 @@ def render(config, root):
     import item_project
     project = item_project.load(root / 'source/items_project.json')
     items = [item for item in project['items'] if item['enabled']]
-    names = {f'culinary_expansion:{i["name"]}': i['ja_name'] for i in items}
-    reference = json.loads((root / 'source/vanilla_food_reference.json').read_text(encoding='utf-8-sig'))
-    names.update({i['id']: i['name'] for i in reference['items']})
-    names.update({'minecraft:egg': '卵', 'minecraft:sugar': '砂糖',
-                  'minecraft:cocoa_beans': 'カカオ豆', 'minecraft:milk_bucket': '牛乳入りバケツ',
-                  'minecraft:glass_bottle': 'ガラス瓶', 'minecraft:bowl': 'ボウル',
-                  'minecraft:bucket': 'バケツ', 'minecraft:paper': '紙',
-                  'minecraft:wheat': '小麦'})
+    names = json.loads((root / 'source/vanilla_item_names.json').read_text(encoding='utf-8-sig'))['names']
+    names.update({f'culinary_expansion:{i["name"]}': i['ja_name'] for i in items})
     generated = item_project.generated(project, root)
     disabled = {'culinary_expansion:' + i['name'] for i in project['items'] if not i['enabled']}
     recipes = []
@@ -38,9 +32,12 @@ def render(config, root):
             return ' または '.join(material(v) for v in value)
         if isinstance(value, dict):
             value = value.get('item') or '#' + value['tag']
-        label = names.get(value, value)
         if value.startswith('#'):
             label = 'タグのいずれか: ' + value[1:]
+        else:
+            if value not in names:
+                raise ValueError(f'レシピ素材の表示名がありません: {value}。表示名辞書を更新してください。')
+            label = names[value]
         return f'<span title="{esc(value)}">{esc(label)}</span>'
 
     def recipe_html(recipe):
@@ -106,10 +103,18 @@ def render(config, root):
                     continue
             recipe_parts.append(recipe_html(recipe))
         details = ''.join(recipe_parts) or '<p>このバージョンには作成レシピがありません。</p>'
-        rows.append(f'''<tr data-nutrition="{item['nutrition']}" data-saturation="{recovery}" data-time="{item['consume_seconds']}" data-effect="{str(item['effect'] != 'なし').lower()}">
+        nutrition_cell=f'<span class="hunger-value">{hunger_icons}<span>{item["nutrition"]}</span></span>'
+        saturation_cell=f'{recovery:g}'
+        time_cell=f'{item["consume_seconds"]:g}秒'
+        if not item['edible']:
+            nutrition_cell='食べられません'
+            saturation_cell=time_cell='—'
+            effect='—'
+            recovery=0
+        rows.append(f'''<tr data-nutrition="{item['nutrition'] if item['edible'] else 0}" data-saturation="{recovery}" data-time="{item['consume_seconds'] if item['edible'] else 0}" data-effect="{str(item['edible'] and item['effect'] != 'なし').lower()}">
 <td><img src="{image}" alt="" width="{width * 2}" height="{height * 2}"><strong>{esc(item['ja_name'])}</strong><small>{esc(item['en_name'])}</small><small><code>{esc(identifier)}</code></small></td><td>{item['stack_size']}</td>
-<td><span class="hunger-value">{hunger_icons}<span>{item['nutrition']}</span></span></td><td>{recovery:g}</td>
-<td>{item['consume_seconds']:g}秒</td><td>{esc(effect)}</td>
+<td>{nutrition_cell}</td><td>{saturation_cell}</td>
+<td>{time_cell}</td><td>{esc(effect)}</td>
 <td>{details}</td></tr>''')
     page = (root / 'build/food-guide.template.html').read_text(encoding='utf-8')
     for key, value in {'MOD_VERSION': esc(config['mod_version']), 'MINECRAFT_VERSION': esc(config['minecraft_version']),

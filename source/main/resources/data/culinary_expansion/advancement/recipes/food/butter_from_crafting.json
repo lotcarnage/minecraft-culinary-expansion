@@ -4,7 +4,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipes": "culinary_expansion:loaf_bread_from_crafting"
+        "recipes": "culinary_expansion:butter_from_crafting"
       }
     },
     "has_material_0": {
@@ -12,7 +12,17 @@
       "conditions": {
         "items": [
           {
-            "items": "culinary_expansion:flour"
+            "items": "minecraft:milk_bucket"
+          }
+        ]
+      }
+    },
+    "has_material_1": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "culinary_expansion:salt"
           }
         ]
       }
@@ -21,12 +31,13 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_material_0"
+      "has_material_0",
+      "has_material_1"
     ]
   ],
   "rewards": {
     "recipes": [
-      "culinary_expansion:loaf_bread_from_crafting"
+      "culinary_expansion:butter_from_crafting"
     ]
   }
 }

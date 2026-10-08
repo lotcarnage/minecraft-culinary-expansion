@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "ingredient": "culinary_expansion:thick_sliced_bread",
+  "result": {
+    "id": "culinary_expansion:thick_sliced_toast",
+    "count": 1
+  },
+  "experience": 0.35,
+  "cookingtime": 150
+}

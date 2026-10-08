@@ -11,6 +11,21 @@ CONFIG = {'mod_version': '0.1.3', 'minecraft_version': '26.3'}
 
 
 class FoodGuideTests(unittest.TestCase):
+    def test_arbitrary_vanilla_cooking_material_uses_display_name(self):
+        project=deepcopy(item_project.load(ROOT/'source/items_project.json'))
+        project['items'][0].update(cooking_ingredient='minecraft:gravel',smelting=True)
+        with patch.object(item_project,'load',return_value=project):
+            page=guide.render(CONFIG,ROOT)
+        self.assertIn('<span title="minecraft:gravel">砂利</span>を',page)
+        self.assertNotIn('>minecraft:gravel</span>',page)
+
+    def test_unknown_material_name_stops_generation(self):
+        project=deepcopy(item_project.load(ROOT/'source/items_project.json'))
+        project['items'][0].update(cooking_ingredient='example:unknown',smelting=True)
+        with patch.object(item_project,'load',return_value=project):
+            with self.assertRaisesRegex(ValueError,'表示名がありません: example:unknown'):
+                guide.render(CONFIG,ROOT)
+
     def test_enabled_items_and_recipe_details(self):
         project = item_project.load(ROOT / 'source/items_project.json')
         page = guide.render(CONFIG, ROOT)
@@ -35,6 +50,19 @@ class FoodGuideTests(unittest.TestCase):
         self.assertNotIn('最大スタック:', page)
         self.assertNotIn('{{ROWS}}', page)
         self.assertNotIn('source/main/', page)
+
+    def test_nonfood_has_no_recovery_time_or_consumption_effect(self):
+        project=deepcopy(item_project.load(ROOT/'source/items_project.json'))
+        project['items'][0].update(edible=False,effect='毒',nutrition=10,consume_seconds=9)
+        with patch.object(item_project,'load',return_value=project):
+            page=guide.render(CONFIG,ROOT)
+        row=page.split('<tr data-nutrition=',1)[1].split('</tr>',1)[0]
+        self.assertIn('食べられません',row)
+        self.assertNotIn('hunger-icon',row)
+        self.assertNotIn('9秒',row)
+        self.assertNotIn('毒',row)
+        self.assertIn('data-effect="false"',row)
+        self.assertIn('で精錬する。',row)
 
     def test_default_order_follows_project_editor(self):
         project = item_project.load(ROOT / 'source/items_project.json')

@@ -14,6 +14,7 @@ from horizontal_tree import HorizontalTreeViewport
 FIELDS = [
  ('表示','enabled','組込み',bool,['有','無']),
  ('表示', 'name', '代表名', str, None),('表示','ja_name','日本語名',str,None),('表示','en_name','英語名',str,None),
+ ('食事','edible','食べられる',bool,['可','不可']),
  ('食事','stack_size','最大スタック数',int,None),('食事','nutrition','満腹度回復量',int,None),
  ('食事','saturation_modifier','隠し満腹度係数',float,None),('食事','always_edible','満腹時使用',bool,['可','不可']),
  ('食事','consume_seconds','食事時間（秒）',float,None),('食事','effect','追加効果',str,list(model.EFFECTS)),
@@ -24,6 +25,23 @@ FIELDS = [
  ('調理','cooking_ingredient','調理素材ID（タグは#）',str,None),('調理','experience','調理経験値',float,None),
  ('調理','cooking_output','調理出力個数',int,None),('クラフト','crafting','クラフト方式',str,['クラフト不可','定型','不定形']),
  ('クラフト','crafting_output','クラフト出力個数',int,None)]
+
+
+def coal_cooking_numbers(ticks, output):
+    """Equivalent batches and resulting items per 1600 ticks of continuous burning."""
+    try:
+        ticks=int(ticks);output=int(output)
+    except (ValueError,TypeError):return None
+    if ticks<1 or output<1:return None
+    batches=1600/ticks
+    return f'{batches:.2f}',f'{batches*output:.2f}'
+
+
+def coal_cooking_capacity(smelting, ticks, output):
+    if not smelting:return 'かまど不可'
+    values=coal_cooking_numbers(ticks,output)
+    if values is None:return '入力を確認'
+    return f'{values[0]}回（完成品{values[1]}個）'
 
 
 class ItemEditor:
@@ -52,6 +70,9 @@ class ItemEditor:
         frame=ttk.Frame(pane);pane.add(frame,weight=5)
         self.columns=[('item_id','アイテムID',None,None,None)]
         self.columns.extend((key,label,key,kind,choices) for group,key,label,kind,choices in FIELDS)
+        position=next(i for i,column in enumerate(self.columns) if column[0]=='cooking_ticks')+1
+        self.columns.insert(position,('coal_capacity','石炭1個のかまど調理量','coal_capacity',None,None))
+        self.columns.insert(position+1,('smoker_coal_capacity','石炭1個の燻製器調理量','smoker_coal_capacity',None,None))
         self.columns.extend((f'slot{i}',f'素材 {slot}',i,str,None) for i,slot in enumerate(model.SLOTS))
         column_ids=tuple(c[0] for c in self.columns)
         self.tree=ttk.Treeview(frame,columns=column_ids+(HorizontalTreeViewport.LEFT,HorizontalTreeViewport.RIGHT),
@@ -87,6 +108,8 @@ class ItemEditor:
         self.commit_button=ttk.Button(buttons,text='変更を反映',command=self.commit_edit)
         self.commit_button.pack(side='left')
         ttk.Button(buttons,text='変更を取消',command=self.cancel_edit).pack(side='left',padx=4)
+        self.copy_id_button=ttk.Button(buttons,text='アイテムIDをコピー',command=self.copy_item_id,state='disabled')
+        self.copy_id_button.pack(side='left',padx=4)
         # Canvas window items are Tkinter's standard way to scroll a form frame.
         self.form_canvas=tk.Canvas(sidebar,highlightthickness=0)
         form_scroll=ttk.Scrollbar(sidebar,orient='vertical',command=self.form_canvas.yview)
@@ -120,6 +143,21 @@ class ItemEditor:
                 width=(10 if key.endswith('ticks') else 7) if numeric else 20
                 widget=ttk.Entry(groups[group],textvariable=variable,width=width,justify='right' if numeric else 'left')
             widget.grid(row=row,column=1,sticky='ew',pady=2);self.inputs[key]=widget
+        row=group_rows['調理']
+        self.coal_capacity_value=tk.StringVar(value='—')
+        self.coal_output_value=tk.StringVar(value='—')
+        self.smoker_coal_capacity_value=tk.StringVar(value='—')
+        self.smoker_coal_output_value=tk.StringVar(value='—')
+        for offset,label,variable in (
+                (0,'石炭1個のかまど調理回数',self.coal_capacity_value),
+                (1,'石炭1個のかまど完成品数',self.coal_output_value),
+                (2,'石炭1個の燻製器調理回数',self.smoker_coal_capacity_value),
+                (3,'石炭1個の燻製器完成品数',self.smoker_coal_output_value)):
+            ttk.Label(groups['調理'],text=label).grid(row=row+offset,column=0,sticky='w',padx=(0,8),pady=2)
+            ttk.Entry(groups['調理'],textvariable=variable,width=7,state='readonly',justify='right').grid(
+                row=row+offset,column=1,sticky='ew',pady=2)
+        for key in ('smelting','smoking','cooking_ticks','cooking_output'):
+            self.edit_values[key].trace_add('write',self.update_coal_capacity)
         slots=ttk.LabelFrame(right_column,text='クラフト素材（空きマスは「不要」）',padding=6)
         slots.pack(fill='x',pady=4)
         for index,slot in enumerate(model.SLOTS):
@@ -130,6 +168,7 @@ class ItemEditor:
             widget=ttk.Entry(cell,textvariable=variable,width=12);widget.pack(anchor='w');self.inputs[index]=widget
             button=ttk.Button(cell,text='素材を選択',command=lambda slot_index=index:self.choose_material(slot_index))
             button.pack(fill='x',pady=2);self.material_buttons[index]=button
+        self.edit_values['edible'].trace_add('write',self.update_food_inputs)
         self.edit_values['crafting'].trace_add('write',self.update_crafting_inputs)
         metadata=ttk.LabelFrame(form,text='管理情報',padding=8);metadata.grid(row=1,column=0,columnspan=2,sticky='ew',pady=4)
         self.metadata_info=ttk.Label(metadata,wraplength=440);self.metadata_info.pack(anchor='w')
@@ -143,6 +182,7 @@ class ItemEditor:
         self.form_canvas.configure(width=form.winfo_reqwidth())
         self.status=tk.StringVar();ttk.Label(window,textvariable=self.status,padding=6).pack(fill='x')
         self.tree.bind('<Button-1>',self.select_cell);self.tree.bind('<<TreeviewSelect>>',self.selection)
+        self.tree.bind('<Control-c>',self.copy_item_id)
         pane.bind('<Configure>',self.initialize_split)
         self.refresh()
 
@@ -154,6 +194,8 @@ class ItemEditor:
         self.initial_split_set=True
 
     def display(self,item,key):
+        if key=='coal_capacity':return coal_cooking_capacity(item['smelting'],item['cooking_ticks'],item['cooking_output'])
+        if key=='smoker_coal_capacity':return coal_cooking_capacity(True,item['cooking_ticks'],item['cooking_output']) if item['smoking'] else '燻製器不可'
         v=item[key]
         if key=='enabled':return '有' if v else '無'
         if isinstance(v,bool):return '可' if v else '不可'
@@ -177,7 +219,7 @@ class ItemEditor:
                 elif isinstance(key,int):value=item['crafting_slots'][key] if item['crafting']!='クラフト不可' else '不可'
                 else:value=self.display(item,key)
                 values.append(value)
-                if key is not None:self.cells[(row,column)]=(index,key,kind,choices)
+                if key is not None and key not in ('coal_capacity','smoker_coal_capacity'):self.cells[(row,column)]=(index,key,kind,choices)
             self.tree.insert('', 'end',iid=row,values=values,tags=() if item['enabled'] else ('disabled_item',))
         self.tree.xview_moveto(horizontal);self.tree.yview_moveto(vertical)
         if select is not None and select<len(self.project['items']):self.tree.selection_set(f'item{select}')
@@ -190,6 +232,15 @@ class ItemEditor:
         if not selection:return None
         row=selection[0]
         return int(row[4:])
+
+    def copy_item_id(self,event=None):
+        index=self.selected()
+        if index is not None:
+            identifier=model.derived(self.project['items'][index])['アイテムID']
+            self.window.clipboard_clear()
+            self.window.clipboard_append(identifier)
+            self.status.set(f'コピーしました: {identifier}')
+        return 'break'
 
     def selection(self,event=None):
         index=self.selected()
@@ -227,6 +278,24 @@ class ItemEditor:
             self.inputs[index].configure(state='normal' if enabled else 'disabled')
             self.material_buttons[index].configure(state='normal' if enabled else 'disabled')
 
+    def update_coal_capacity(self,*args):
+        for key,batches_value,output_value in (
+                ('smelting',self.coal_capacity_value,self.coal_output_value),
+                ('smoking',self.smoker_coal_capacity_value,self.smoker_coal_output_value)):
+            values=None
+            if self.edit_target is not None and self.edit_values[key].get()=='可':
+                values=coal_cooking_numbers(self.edit_values['cooking_ticks'].get(),self.edit_values['cooking_output'].get())
+            batches,output=values or ('—','—')
+            batches_value.set(batches)
+            output_value.set(output)
+
+    def update_food_inputs(self,*args):
+        edible=self.edit_target is not None and self.edit_values['edible'].get()=='可'
+        for group,key,*rest in FIELDS:
+            if group=='食事' and key not in ('edible','stack_size'):
+                widget=self.inputs[key]
+                widget.configure(state=('readonly' if isinstance(widget,ttk.Combobox) else 'normal') if edible else 'disabled')
+
     def choose_material(self,slot_index):
         if self.edit_target is None or self.edit_values['crafting'].get()=='クラフト不可':return
         from material_picker import MaterialPicker
@@ -241,6 +310,7 @@ class ItemEditor:
         if index==self.edit_target and self.has_pending_edit():return
         self.edit_target=index
         self.commit_button.configure(state='normal' if index is not None else 'disabled')
+        self.copy_id_button.configure(state='normal' if index is not None else 'disabled')
         self.edit_item.configure(text=f'{model.NS}:{self.project["items"][index]["name"]}' if index is not None else 'アイテムを選択')
         for key,variable in self.edit_values.items():
             if index is None:value=''
@@ -252,10 +322,13 @@ class ItemEditor:
             choices=isinstance(self.inputs[key],ttk.Combobox)
             self.inputs[key].configure(state=('readonly' if choices else 'normal') if index is not None else 'disabled')
         self.update_crafting_inputs()
+        self.update_food_inputs()
+        self.update_coal_capacity()
 
     def cancel_edit(self,event=None):
         for key,value in self.original_values.items():self.edit_values[key].set(value)
         self.update_crafting_inputs()
+        self.update_food_inputs()
 
     def commit_edit(self,event=None):
         if self.edit_target is None:return False

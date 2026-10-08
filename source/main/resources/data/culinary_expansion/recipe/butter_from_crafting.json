@@ -1,11 +1,12 @@
 {
   "category": "misc",
   "result": {
-    "id": "culinary_expansion:salt",
+    "id": "culinary_expansion:butter",
     "count": 1
   },
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    "culinary_expansion:salt_bucket"
+    "minecraft:milk_bucket",
+    "culinary_expansion:salt"
   ]
 }

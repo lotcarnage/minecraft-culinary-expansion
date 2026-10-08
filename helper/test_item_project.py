@@ -14,6 +14,38 @@ class ProjectTests(unittest.TestCase):
         self.project={'schema_version':1,'items':[m.default_item('fried_egg')],'generated_files':[]}
         m.save(self.project,self.path)
     def tearDown(self):self.temp.cleanup()
+    def test_legacy_edible_default_and_explicit_nonfood_roundtrip(self):
+        old=json.loads(self.path.read_text(encoding='utf-8'))
+        old['items'][0].pop('edible')
+        old['items'][0]['nutrition']=0
+        self.path.write_text(json.dumps(old),encoding='utf-8')
+        loaded=m.load(self.path)
+        self.assertTrue(loaded['items'][0]['edible'])
+        loaded['items'][0]['edible']=False
+        m.save(loaded,self.path)
+        self.assertFalse(m.load(self.path)['items'][0]['edible'])
+        loaded['items'][0]['edible']='false'
+        with self.assertRaisesRegex(ValueError,'食べられる'):
+            m.validate(loaded)
+
+    def test_nonfood_generation_keeps_recipes_without_consumption(self):
+        item=self.project['items'][0]
+        item.update(edible=False,effect='毒',remainder='バケツ',always_edible=True)
+        files=m.generated(self.project,self.root)
+        java=files[m.JAVA+'ModItems.java'].decode()
+        registration=next(line for line in java.splitlines() if 'ITEMS.register(' in line)
+        self.assertNotIn('.food(',registration)
+        self.assertNotIn('usingConvertsTo',registration)
+        self.assertIn('CreativeModeTabs.INGREDIENTS',java)
+        self.assertIn('event.accept(FRIED_EGG)',java)
+        recipe=json.loads(files[m.DATA+'recipe/fried_egg_from_smoking.json'])
+        self.assertEqual(recipe['category'],'misc')
+        self.assertEqual(recipe['result']['id'],'culinary_expansion:fried_egg')
+        item['edible']=True
+        java=m.generated(self.project,self.root)[m.JAVA+'ModItems.java'].decode()
+        self.assertIn('.food(',java)
+        self.assertIn('usingConvertsTo(Items.BUCKET)',java)
+
     def test_placeholder_texture_and_existing_texture(self):
         item=m.default_item('test_disk')
         texture=m.ensure_texture(item,self.root)
