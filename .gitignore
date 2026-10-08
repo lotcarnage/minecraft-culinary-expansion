@@ -1,7 +1,11 @@
 # Generated working files and caches
 /intermediate/
 /build/intermediate/
+/build/build/
 /build/.gradle/
+/build/paper/intermediate/
+/build/paper/build/
+/build/paper/.gradle/
 /.gradle/
 /.tools/
 
