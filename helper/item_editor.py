@@ -4,6 +4,7 @@ from copy import deepcopy
 from pathlib import Path
 import struct
 import tkinter as tk
+from error_messages import japanese_error
 from tkinter import font as tkfont
 from tkinter import ttk, filedialog, messagebox, simpledialog
 import webbrowser
@@ -233,7 +234,7 @@ class ItemEditor:
             MaterialPicker(self.window,model.ROOT,self.project['items'],self.edit_values[slot_index].get(),
                            self.edit_values[slot_index].set)
         except Exception as error:
-            messagebox.showerror('素材一覧エラー',str(error),parent=self.window)
+            messagebox.showerror('素材一覧エラー',japanese_error(error),parent=self.window)
 
     def load_edit(self):
         index=self.selected()
@@ -269,7 +270,7 @@ class ItemEditor:
             target['crafting_slots']=[self.edit_values[i].get().strip() for i in range(9)]
             model.validate(candidate)
         except (ValueError,TypeError) as error:
-            messagebox.showerror('入力エラー',str(error),parent=self.window)
+            messagebox.showerror('入力エラー',japanese_error(error),parent=self.window)
             return False
         if candidate!=self.project:
             self.project=candidate;self.dirty=True
@@ -286,7 +287,7 @@ class ItemEditor:
     def save(self):
         if self.pending():return False
         try:model.save(self.project,self.path);self.dirty=False;self.refresh(self.selected());return True
-        except Exception as error:messagebox.showerror('保存エラー',str(error),parent=self.window);return False
+        except Exception as error:messagebox.showerror('保存エラー',japanese_error(error),parent=self.window);return False
 
     def save_as(self):
         if self.pending():return
@@ -303,7 +304,7 @@ class ItemEditor:
         filename=filedialog.askopenfilename(parent=self.window,filetypes=[('JSON project','*.json')])
         if filename:
             try:project=model.load(filename)
-            except Exception as error:messagebox.showerror('読込エラー',str(error),parent=self.window);return
+            except Exception as error:messagebox.showerror('読込エラー',japanese_error(error),parent=self.window);return
             self.path=Path(filename);self.project=project;self.dirty=False;self.refresh()
 
     def add(self):
@@ -314,7 +315,7 @@ class ItemEditor:
         try:
             model.validate(candidate)
             model.ensure_texture(candidate['items'][-1])
-        except Exception as error:messagebox.showerror('追加エラー',str(error),parent=self.window);return
+        except Exception as error:messagebox.showerror('追加エラー',japanese_error(error),parent=self.window);return
         self.project=candidate;self.dirty=True;self.refresh(len(candidate['items'])-1)
 
     def move_item(self,direction):
@@ -343,10 +344,10 @@ class ItemEditor:
                     for name in ('item_dashboard.html','resource_dashboard.html'):
                         (model.ROOT/'document'/name).write_text('<!doctype html><meta charset="utf-8"><title>アイテム一覧</title><h1>登録アイテムなし</h1>',encoding='utf-8')
             except Exception as error:
-                messagebox.showwarning('一覧生成',f'定義は反映済みです。一覧の生成に失敗しました: {error}',parent=self.window)
+                messagebox.showwarning('一覧生成',f'定義は反映済みです。一覧の生成に失敗しました: {japanese_error(error)}',parent=self.window)
             self.status.set(f'{count}定義ファイルを生成しました。ゲームへの反映には再ビルドしてください。')
             return True
-        except Exception as error:messagebox.showerror('反映エラー',str(error),parent=self.window);return False
+        except Exception as error:messagebox.showerror('反映エラー',japanese_error(error),parent=self.window);return False
 
     def delete(self):
         if self.pending():return
@@ -367,11 +368,11 @@ class ItemEditor:
             data=Path(filename).read_bytes()
             if data[:8]!=b'\x89PNG\r\n\x1a\n':raise ValueError('PNG画像を指定してください')
             width,height=struct.unpack('>II',data[16:24])
-            if width<1 or height<1:raise ValueError('Invalid image dimensions')
+            if width<1 or height<1:raise ValueError('画像の幅と高さは1ピクセル以上にしてください。')
             target=model.ROOT/model.derived(self.project['items'][index])['テクスチャ']
             target.parent.mkdir(parents=True,exist_ok=True);temp=target.with_suffix('.png.tmp');temp.write_bytes(data);temp.replace(target)
             self.selection();self.status.set(f'テクスチャを配置: {target.name} ({width}×{height})')
-        except Exception as error:messagebox.showerror('画像エラー',str(error),parent=self.window)
+        except Exception as error:messagebox.showerror('画像エラー',japanese_error(error),parent=self.window)
 
     def show_food_reference(self):
         if self.reference_window and self.reference_window.window.winfo_exists():
@@ -381,7 +382,7 @@ class ItemEditor:
         try:
             self.reference_window=FoodReference(self.window,model.ROOT/'source/vanilla_food_reference.json')
         except (OSError,ValueError) as error:
-            messagebox.showerror('参考値の読み込みエラー',str(error),parent=self.window)
+            messagebox.showerror('参考値の読み込みエラー',japanese_error(error),parent=self.window)
 
     def dashboard(self):
         target=model.ROOT/'document/item_dashboard.html'
@@ -395,6 +396,6 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--project',type=Path,default=model.PROJECT)
     args=parser.parse_args();window=tk.Tk()
     try:ItemEditor(window,args.project)
-    except Exception as error:messagebox.showerror('起動エラー',str(error),parent=window);window.destroy();raise SystemExit(1)
+    except Exception as error:messagebox.showerror('起動エラー',japanese_error(error),parent=window);window.destroy();raise SystemExit(1)
     window.mainloop()
 

@@ -71,7 +71,7 @@ def generate(output):
     recipe_rows, ingredient_rows, texture_rows, issue_rows = [], [], [], []
     for identifier, expression, java in registrations():
         if identifier in seen:
-            raise ValueError(f'Duplicate item ID: {identifier}')
+            raise ValueError(f'アイテムIDが重複しています: {identifier}')
         seen.add(identifier)
         namespace, name = identifier.split(':', 1)
         key = f'item.{namespace}.{name.replace("/", ".")}'
@@ -206,7 +206,7 @@ def generate(output):
             issue_rows.append([esc(identifier), esc(warning)])
 
     if not rows:
-        raise ValueError('No literal ITEMS.register registrations with MOD_ID found.')
+        raise ValueError('MOD_IDを指定したアイテム登録が見つかりません。先に定義へ反映してください。')
     def table(title, columns, data):
         heads = ''.join('<th scope="col">' + esc(c) + '</th>' for c in columns)
         body = ''.join('<tr>' + ''.join('<td>' + cell + '</td>' for cell in row) + '</tr>' for row in data)
@@ -254,30 +254,30 @@ def generate(output):
         by_type = {}
         for recipe in cooking_recipes:
             if recipe[2] in by_type:
-                raise ValueError(f'Multiple recipes of the same cooking type for {identifier}; cannot summarize without losing data.')
+                raise ValueError(f'{identifier}に同じ調理方式のレシピが複数あり、一覧にまとめられません。')
             by_type[recipe[2]] = recipe
         smelt = by_type.get('minecraft:smelting')
         smoke = by_type.get('minecraft:smoking')
         campfire = by_type.get('minecraft:campfire_cooking')
         unsupported = set(by_type) - {'minecraft:smelting', 'minecraft:smoking', 'minecraft:campfire_cooking'}
         if unsupported:
-            raise ValueError(f'Unsupported cooking summary types: {unsupported}')
+            raise ValueError(f'一覧表示に対応していない調理方式です: {unsupported}')
         primary = smelt or smoke or campfire
         base = smelt or smoke
         for recipe in cooking_recipes:
             if primary and recipe[4] != primary[4]:
-                raise ValueError(f'Different output counts for {identifier}; cannot summarize.')
+                raise ValueError(f'{identifier}の調理レシピの出力個数が異なるため、一覧にまとめられません。')
             if primary and recipe[7] != primary[7]:
-                raise ValueError(f'Different experience values for {identifier}; cannot summarize.')
+                raise ValueError(f'{identifier}の調理レシピの経験値が異なるため、一覧にまとめられません。')
         if smelt and smoke and smelt[5] != smoke[5]:
-            raise ValueError(f'Different furnace/smoker base times for {identifier}; check recipe definitions.')
+            raise ValueError(f'{identifier}のかまどと燻製器の基準時間が異なります。レシピ定義を確認してください。')
         cells.extend(['可' if smelt else '不可', '可' if smoke else '不可', campfire[5] if campfire else '不可',
                       base[5] if base else '調理不可', primary[7] if primary else '調理不可', primary[4] if primary else '調理不可'])
         materials = [r for r in ingredient_rows if primary and r[0] == identifier and r[1] == primary[1]]
         for recipe in cooking_recipes:
             other = [r[2:] for r in ingredient_rows if r[0] == identifier and r[1] == recipe[1]]
             if other != [r[2:] for r in materials]:
-                raise ValueError(f'Different ingredients for {identifier}; cannot summarize.')
+                raise ValueError(f'{identifier}の調理レシピの素材が異なるため、一覧にまとめられません。')
         for j in range(max_ingredients):
             cells.extend(materials[j][2:] if j < len(materials) else ['不要'] * len(ingredient_columns))
         for i in range(max_crafts):
@@ -293,14 +293,14 @@ def generate(output):
                 if shaped:
                     slot = material[2]
                     if slot not in craft_slots:
-                        raise ValueError(f'Crafting position outside 3x3 grid: {slot}')
+                        raise ValueError(f'クラフト素材の位置が3×3の範囲外です: {slot}')
                 else:
                     index = int(material[2]) - 1
                     if not 0 <= index < 9:
-                        raise ValueError('Shapeless recipe exceeds 9 ingredients')
+                        raise ValueError('不定形レシピの素材数が9個を超えています。')
                     slot = craft_slots[index]
                 if slot in slots:
-                    raise ValueError(f'Multiple ingredient alternatives at {slot}; use a tag for a single-reference cell.')
+                    raise ValueError(f'素材欄{slot}に複数の候補があります。素材タグを指定してください。')
                 slots[slot] = ('#' if material[3] == 'タグ' else '') + material[4]
             cells.extend(slots.get(slot, '不要') for slot in craft_slots)
         item_textures = texture_groups.get(identifier, [])
@@ -354,7 +354,7 @@ for(const section of sections){const rows=[...section.querySelectorAll('tbody tr
 input.addEventListener('input',filter);filter();</script></html>'''
     metadata_output = output.with_name('resource_dashboard.html')
     if metadata_output == output:
-        raise ValueError('Item output must differ from resource_dashboard.html')
+        raise ValueError('アイテム一覧の保存先はリソース管理一覧と別にしてください。')
     metadata_page = page.replace('追加アイテム一覧', 'リソース管理一覧')
     metadata_page = metadata_page.replace('TABLES', metadata_table)
     metadata_page = re.sub(r'<h1>リソース管理一覧</h1><p>.*?</p>', '<h1>リソース管理一覧</h1><p>Javaソース・表示定義・モデル・レシピ・テクスチャの管理用メタ情報。1アイテム1行、各列は単一属性です。</p>', metadata_page, count=1, flags=re.S)

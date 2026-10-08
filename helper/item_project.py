@@ -59,6 +59,17 @@ EFFECTS = {
 }
 REMAINDERS = {'なし': None, 'ボウル': 'BOWL', 'ガラス瓶': 'GLASS_BOTTLE', 'バケツ': 'BUCKET'}
 SLOTS = [f'{r}:{c}' for r in range(1, 4) for c in range(1, 4)]
+FIELD_LABELS = {
+    'stack_size': '最大スタック数', 'nutrition': '満腹度回復量',
+    'saturation_modifier': '隠し満腹度係数', 'consume_seconds': '食事時間',
+    'effect_ticks': '効果時間', 'effect_level': '効果レベル',
+    'effect_probability': '効果発生確率', 'cooking_ticks': '基準調理時間',
+    'experience': '調理経験値', 'cooking_output': '調理出力個数',
+    'crafting_output': 'クラフト出力個数', 'campfire_ticks': '焚き火の調理時間',
+    'enabled': '組込み', 'always_edible': '満腹時使用', 'smelting': 'かまど対応',
+    'smoking': '燻製器対応',
+}
+
 
 
 def default_item(name):
@@ -110,45 +121,45 @@ def ensure_texture(item, root=ROOT):
 
 def validate(project):
     if project.get('schema_version') != 1 or not isinstance(project.get('items'), list):
-        raise ValueError('Unsupported project schema')
+        raise ValueError('プロジェクトファイルの形式に対応していません。schema_versionとアイテム一覧を確認してください。')
     version=project.get('version', '0.1.0')
     if not isinstance(version,str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._+-]{0,63}',version):
-        raise ValueError('Invalid project version: use 1..64 filename-safe letters, digits, ., _, + or -')
+        raise ValueError('プロジェクトバージョンは半角英数字で始め、半角英数字と「.」「_」「+」「-」を使って1〜64文字で指定してください。')
     names = set()
     def number(item, key, low, high, integer=False):
         v = item[key]
         if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or not low <= v <= high or (integer and not isinstance(v, int)):
-            raise ValueError(f'{item["name"]}: {key} must be {low}..{high}')
+            raise ValueError(f'{item["name"]}: {FIELD_LABELS[key]}は{low}〜{high}の範囲の' + ('整数' if integer else '数値') + 'を指定してください。')
     def reference(v):
         if not isinstance(v, str) or not re.fullmatch(r'#?[a-z0-9_.-]+:[a-z0-9_/.-]+', v):
-            raise ValueError(f'Invalid material ID: {v}')
+            raise ValueError(f'素材IDの形式が正しくありません: {v}。例: minecraft:wheat')
     for item in project['items']:
         if set(item) != set(default_item('example')):
-            raise ValueError('Missing or unknown item fields')
+            raise ValueError('アイテムの設定項目に不足または未対応の項目があります。プロジェクトファイルを確認してください。')
         name = item['name']
         if not isinstance(name, str) or not re.fullmatch(r'[a-z][a-z0-9_]{0,63}', name) or name in names:
-            raise ValueError(f'Invalid or duplicate representative name: {name}')
+            raise ValueError(f'代表名「{name}」の形式が正しくないか、同じ代表名が登録済みです。小文字の半角英字で始め、小文字の半角英数字と「_」を使って1〜64文字で指定してください。')
         names.add(name)
         for k in ('ja_name', 'en_name'):
-            if not isinstance(item[k], str) or not item[k].strip(): raise ValueError(f'{k} is required')
+            if not isinstance(item[k], str) or not item[k].strip(): raise ValueError(('日本語名' if k=='ja_name' else '英語名')+'を入力してください。')
         for k,lo,hi,integer in [('stack_size',1,99,True),('nutrition',0,100,True),('saturation_modifier',0,10,False),
                                ('consume_seconds',0.05,120,False),('effect_ticks',1,2147483647,True),
                                ('effect_level',1,256,True),('effect_probability',0,1,False),('cooking_ticks',1,2147483647,True),
                                ('experience',0,100,False),('cooking_output',1,99,True),('crafting_output',1,99,True)]:
             number(item,k,lo,hi,integer)
         for k in ('enabled','always_edible','smelting','smoking'):
-            if not isinstance(item[k],bool):raise ValueError(f'{k} must be boolean')
+            if not isinstance(item[k],bool):raise ValueError(f'{FIELD_LABELS[k]}には有効・無効を指定してください。JSONではtrueまたはfalseを使います。')
         if item['campfire_ticks'] is not None: number(item,'campfire_ticks',1,2147483647,True)
-        if item['effect'] not in EFFECTS or item['remainder'] not in REMAINDERS:raise ValueError('Unknown effect or remainder')
-        if item['crafting'] not in ('クラフト不可','定型','不定形'):raise ValueError('Unknown crafting type')
+        if item['effect'] not in EFFECTS or item['remainder'] not in REMAINDERS:raise ValueError('追加効果または使用後の残り物が選択肢にありません。')
+        if item['crafting'] not in ('クラフト不可','定型','不定形'):raise ValueError('クラフト方式を選択肢から指定してください。')
         reference(item['cooking_ingredient'])
         slots=item['crafting_slots']
-        if not isinstance(slots,list) or len(slots)!=9:raise ValueError('Exactly 9 crafting slots required')
+        if not isinstance(slots,list) or len(slots)!=9:raise ValueError('クラフト素材欄は9マス必要です。空きマスには「不要」を指定してください。')
         for slot in slots:
             if slot != '不要':reference(slot)
-        if item['crafting']!='クラフト不可' and all(s=='不要' for s in slots):raise ValueError('Crafting requires materials')
+        if item['crafting']!='クラフト不可' and all(s=='不要' for s in slots):raise ValueError('クラフトするには素材を1つ以上指定してください。')
         if item['cooking_output'] > item['stack_size'] or item['crafting_output'] > item['stack_size']:
-            raise ValueError('Output count cannot exceed stack size')
+            raise ValueError('調理またはクラフトの出力個数は、最大スタック数以下にしてください。')
     return project
 
 
@@ -290,7 +301,7 @@ def export(project,path=PROJECT,root=ROOT):
         if p not in files:files[p]=(root/p).read_bytes() if (root/p).exists() else data
     # The on-disk project is the authoritative previous ownership manifest.
     previous=load(path).get('generated_files',[]) if Path(path).exists() else []
-    if any(not allowed(p) for p in previous):raise ValueError('Unsafe generated-files manifest')
+    if any(not allowed(p) for p in previous):raise ValueError('生成ファイル一覧に許可されていないパスがあります。プロジェクトファイルを確認してください。')
     affected=set(previous)|set(files)
     backups={p:(root/p).read_bytes() if (root/p).exists() else None for p in affected}
     old_project=Path(path).read_bytes() if Path(path).exists() else None

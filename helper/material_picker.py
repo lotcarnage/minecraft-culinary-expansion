@@ -4,6 +4,7 @@ from contextlib import ExitStack
 import os
 from pathlib import Path
 import tkinter as tk
+from error_messages import japanese_error
 from tkinter import ttk, filedialog, messagebox
 import zipfile
 
@@ -132,7 +133,7 @@ class MaterialPicker:
             catalog=MaterialCatalog(self.root,self.items,Path(path))
             if not any(key.startswith('minecraft:') for key in catalog.entries):raise ValueError('Minecraftのアイテム定義がありません')
         except (OSError,ValueError,zipfile.BadZipFile) as error:
-            messagebox.showerror('読み込みエラー',str(error),parent=self.window);return
+            messagebox.showerror('読み込みエラー',japanese_error(error),parent=self.window);return
         self.catalog=catalog;self.images={};self.page=0;self.populate()
 
     def filter(self,*args):self.page=0;self.populate()
