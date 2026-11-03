@@ -22,7 +22,7 @@ MAPPING = {
     'raw_meat_patty': 1, 'hamburg_steak': 2, 'hamburger': 3,
     'sweet_berry_juice': 0, 'melon_juice': 5, 'milk_bottle': 4,
     'milk_cocoa': 8, 'sweet_berry_milk': 6, 'loaf_bread': 9,
-    'salt_bucket': 7, 'salt': 7, 'salted_pork': 1, 'bacon': 2,
+    'salt': 7, 'salted_pork': 1, 'bacon': 2,
     'pork_block': 1, 'lard_block': 4, 'lard_grain': 4,
     'raw_french_fries': 9, 'fresh_french_fries': 9, 'french_fries': 9,
     'kelp_stock': 8,

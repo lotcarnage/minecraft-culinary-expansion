@@ -705,43 +705,6 @@
       ]
     },
     {
-      "name": "salt_bucket",
-      "ja_name": "塩入りバケツ",
-      "en_name": "Salt Bucket",
-      "stack_size": 1,
-      "nutrition": 0,
-      "saturation_modifier": 0.0,
-      "always_edible": false,
-      "consume_seconds": 1.6,
-      "effect": "なし",
-      "effect_ticks": 200,
-      "effect_level": 1,
-      "effect_probability": 1.0,
-      "remainder": "なし",
-      "smelting": false,
-      "smoking": false,
-      "cooking_ticks": 200,
-      "experience": 0.35,
-      "cooking_ingredient": "minecraft:egg",
-      "cooking_output": 1,
-      "campfire_ticks": null,
-      "crafting": "クラフト不可",
-      "crafting_output": 1,
-      "crafting_slots": [
-        "不要",
-        "不要",
-        "不要",
-        "不要",
-        "不要",
-        "不要",
-        "不要",
-        "不要",
-        "不要"
-      ],
-      "enabled": false,
-      "edible": true
-    },
-    {
       "name": "salted_pork",
       "ja_name": "豚肉の塩漬け",
       "en_name": "Salted Pork",
@@ -1099,7 +1062,6 @@
     "source/main/resources/assets/culinary_expansion/items/raw_french_fries.json",
     "source/main/resources/assets/culinary_expansion/items/raw_meat_patty.json",
     "source/main/resources/assets/culinary_expansion/items/salt.json",
-    "source/main/resources/assets/culinary_expansion/items/salt_bucket.json",
     "source/main/resources/assets/culinary_expansion/items/salted_pork.json",
     "source/main/resources/assets/culinary_expansion/items/sweet_berry_juice.json",
     "source/main/resources/assets/culinary_expansion/items/sweet_berry_milk.json",
@@ -1130,7 +1092,6 @@
     "source/main/resources/assets/culinary_expansion/models/item/raw_french_fries.json",
     "source/main/resources/assets/culinary_expansion/models/item/raw_meat_patty.json",
     "source/main/resources/assets/culinary_expansion/models/item/salt.json",
-    "source/main/resources/assets/culinary_expansion/models/item/salt_bucket.json",
     "source/main/resources/assets/culinary_expansion/models/item/salted_pork.json",
     "source/main/resources/assets/culinary_expansion/models/item/sweet_berry_juice.json",
     "source/main/resources/assets/culinary_expansion/models/item/sweet_berry_milk.json",
@@ -1201,23 +1162,6 @@
   ],
   "planned_mechanics": {
     "status": "仕様のみ。標準ジェネレーターはこの項目を実装しません。",
-    "ocean_smelting": {
-      "input": "minecraft:water_bucket",
-      "output": "culinary_expansion:salt_bucket",
-      "count": 1,
-      "biome_tag": "#minecraft:is_ocean",
-      "check_position": "furnace",
-      "outside_ocean": "精錬不可。燃料を消費しない。"
-    },
-    "crafting_remainders": [
-      {
-        "ingredient": "culinary_expansion:salt_bucket",
-        "remainder": "minecraft:bucket",
-        "recipe_output": "culinary_expansion:salt",
-        "count": 1,
-        "return_location": "crafting_slot"
-      }
-    ],
     "milk_cauldron": {
       "fill": "minecraft:milk_bucket",
       "fill_remainder": "minecraft:bucket",

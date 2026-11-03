@@ -40,12 +40,32 @@ class PaperReleaseTests(unittest.TestCase):
         self.assertIn('p.item("fried_egg", 64, 2, 2.4F', java)
         self.assertIn('"GLASS_BOTTLE", "NIGHT_VISION", 600, 0, 1.0', java)
         self.assertIn('p.ingredient("culinary_expansion:loaf_bread")', java)
-        self.assertNotIn('p.item("salt",', java)
+        self.assertIn('p.item("salt",', java)
+        self.assertIn('p.item("moshio",', java)
+        self.assertIn('p.recipeKey("moshio_from_smoking")', java)
+        self.assertIn('p.recipeKey("salt_from_smelting")', java)
+        self.assertNotIn('salt_bucket', java)
         self.assertNotIn('salt_from_crafting', java)
         with zipfile.ZipFile(self.root / 'intermediate/paper-generated' / paper.pack_name(self.config)) as archive:
             self.assertIn('assets/culinary_expansion/items/fried_egg.json', archive.namelist())
-            self.assertNotIn('assets/culinary_expansion/items/salt.json', archive.namelist())
+            self.assertIn('assets/culinary_expansion/items/salt.json', archive.namelist())
+            self.assertIn('assets/culinary_expansion/items/moshio.json', archive.namelist())
+            self.assertNotIn('assets/culinary_expansion/items/salt_bucket.json', archive.namelist())
             self.assertIn('item.culinary_expansion.fried_egg', json.loads(archive.read('assets/culinary_expansion/lang/ja_jp.json')))
+
+    def test_disabled_salt_is_excluded_with_dependent_recipes(self):
+        path=self.root/'source/items_project.json'
+        project=json.loads(path.read_text(encoding='utf-8'))
+        next(item for item in project['items'] if item['name']=='salt')['enabled']=False
+        path.write_text(json.dumps(project),encoding='utf-8')
+        paper.generate(self.root,self.config)
+        java=(self.root/'intermediate/paper-generated/java/dev/lotcarnage/culinaryexpansion/paper/GeneratedContent.java').read_text()
+        self.assertNotIn('p.item("salt",',java)
+        self.assertNotIn('salt_from_smelting',java)
+        self.assertNotIn('p.ingredient("culinary_expansion:salt")',java)
+        with zipfile.ZipFile(self.root/'intermediate/paper-generated'/paper.pack_name(self.config)) as archive:
+            self.assertNotIn('assets/culinary_expansion/items/salt.json',archive.namelist())
+            self.assertNotIn('item.culinary_expansion.salt',json.loads(archive.read('assets/culinary_expansion/lang/ja_jp.json')))
 
     def test_nonfood_flag_is_passed_to_paper_factory(self):
         path=self.root/'source/items_project.json'
